@@ -1,0 +1,17 @@
+﻿# Normalizar line endings
+* text=auto
+
+# PHP y texto: LF en repo
+*.php text eol=lf
+*.tpl text eol=lf
+*.xml text eol=lf
+*.sql text eol=lf
+*.md  text eol=lf
+*.txt text eol=lf
+.gitignore text eol=lf
+
+# Binarios: sin conversión
+*.png binary
+*.jpg binary
+*.gif binary
+*.zip binary
