@@ -1,0 +1,8 @@
+.DS_Store
+Thumbs.db
+.idea/
+
+*.log
+config.xml
+/vendor/
+node_modules/
