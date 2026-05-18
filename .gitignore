@@ -1,8 +1,38 @@
+# Zips de release (van a sensabien/versiones-zip/)
+_dist/
+*.zip
+
+# Sistema
 .DS_Store
 Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# IDEs
 .idea/
 
-*.log
-config.xml
-/vendor/
+*.sublime-project
+*.sublime-workspace
+
+
+
+
+# Backups y temporales
+*.bak
+*.bak_*
+*.bak.*
+debug_*
+test_*.php
+
+# Variables de entorno
+.env
+.env.local
+.env.*.local
+
+# Composer/Node
+vendor/
+composer.lock
 node_modules/
+package-lock.json
