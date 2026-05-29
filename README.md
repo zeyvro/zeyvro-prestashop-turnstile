@@ -80,7 +80,7 @@ Página re-renderiza con mensaje de error al usuario
 
 ## Compatibilidad
 
-- PrestaShop 8.x
+- PrestaShop 8.1+ (probado en 8.2.x)
 - Módulo `contactform` nativo (cualquier versión)
 - No requiere override de templates
 - No interfiere con otros módulos de formulario
