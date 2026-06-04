@@ -1,4 +1,4 @@
-# Zips de release (van a sensabien/versiones-zip/)
+# ZIPs y dist
 _dist/
 *.zip
 
@@ -13,8 +13,6 @@ desktop.ini
 # IDEs
 .idea/
 
-*.sublime-project
-*.sublime-workspace
 
 
 
@@ -36,7 +34,3 @@ vendor/
 composer.lock
 node_modules/
 package-lock.json
-
-# Track VS Code workspace settings for sync hygiene
-!
-!settings.json
