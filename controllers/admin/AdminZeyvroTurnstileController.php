@@ -23,7 +23,7 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
      * POST PROCESSING (form save + clear logs)
      * =================================================================== */
 
-    public function postProcess()
+    public function postProcess(): void
     {
         if (Tools::isSubmit('submitZeyvroTurnstile')) {
             $this->saveSettings();
@@ -98,7 +98,7 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
      * RENDER
      * =================================================================== */
 
-    public function initContent()
+    public function initContent(): void
     {
         parent::initContent();
 
@@ -208,7 +208,7 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
         ];
 
         $fieldsValue = [];
-        foreach (Zeyvroturnstile::CONFIG_KEYS as $k) {
+        foreach (ZeyvroTurnstile::CONFIG_KEYS as $k) {
             $fieldsValue[$k] = Configuration::get($k);
         }
 

@@ -3,6 +3,12 @@
 All notable changes to zeyvro-prestashop-turnstile are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) — [Semantic Versioning](https://semver.org/).
 
+## [1.0.4] - 2026-06-04
+### Fixed
+- `AdminZeyvroTurnstileController`: referencia a clase `Zeyvroturnstile::CONFIG_KEYS` corregida a `ZeyvroTurnstile::CONFIG_KEYS` (PHPStan — clase inexistente).
+- `postProcess()` e `initContent()` en `AdminZeyvroTurnstileController`: añadido return type `: void` para coincidir con la firma del padre.
+- `install()` y `uninstall()` en `ZeyvroTurnstile`: añadido return type `: bool` para coincidir con `Module`.
+
 ## [1.0.3] - 2026-05-19
 ### Changed
 - Rebranded from SensaBien internal module to Zeyvro public release
