@@ -208,7 +208,7 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
         ];
 
         $fieldsValue = [];
-        foreach (Zeyvroturnstile::CONFIG_KEYS as $k) {
+        foreach (ZeyvroTurnstile::CONFIG_KEYS as $k) {
             $fieldsValue[$k] = Configuration::get($k);
         }
 
