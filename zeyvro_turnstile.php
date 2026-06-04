@@ -27,7 +27,7 @@ class ZeyvroTurnstile extends Module
     {
         $this->name          = 'zeyvro_turnstile';
         $this->tab           = 'other';
-        $this->version       = '1.0.3';
+        $this->version       = '1.0.4';
         $this->author        = 'Zeyvro';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => _PS_VERSION_];
@@ -43,7 +43,7 @@ class ZeyvroTurnstile extends Module
      * INSTALL / UNINSTALL
      * =================================================================== */
 
-    public function install()
+    public function install(): bool
     {
         return parent::install()
             && $this->installTab()
@@ -54,7 +54,7 @@ class ZeyvroTurnstile extends Module
             && $this->registerHook('actionFrontControllerSetMedia');
     }
 
-    public function uninstall()
+    public function uninstall(): bool
     {
         return parent::uninstall()
             && $this->uninstallTab()
