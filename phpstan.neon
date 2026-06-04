@@ -1,0 +1,47 @@
+includes:
+    - vendor/prestashop/phpstan-prestashop/extension.neon
+
+parameters:
+    level: 1
+
+    bootstrapFiles:
+        - .phpstan/ps-stubs.php
+        - .phpstan/ps-stubs-ns.php
+
+    scanFiles:
+        - .phpstan/ps-stubs.php
+        - .phpstan/ps-stubs-ns.php
+
+    parallel:
+        maximumNumberOfProcesses: 1
+
+    paths:
+        - zeyvro_turnstile.php
+        - controllers
+
+    excludePaths:
+        - _dist
+        - vendor
+        - upgrade
+
+    # Requeridos por prestashop/phpstan-prestashop 2.0
+    isUseStrictTypesForNewClassesRuleActive: false
+    isClassConstantsMustHaveVisibilityRuleActive: false
+    isUseTypedReturnForNewMethodsRuleActive: false
+    isUseTypeHintForNewMethodsRuleActive: false
+
+services:
+    strictTypesForNewClassesRuleConfigurationFileLoader:
+        class: PHPStanForPrestaShop\PHPConfigurationLoader\PHPConfigurationFileLoader
+        arguments:
+            - '.phpstan/strict-types-exclusions.php'
+
+    returnTypesForNewMethodsRuleConfigurationFileLoader:
+        class: PHPStanForPrestaShop\PHPConfigurationLoader\PHPConfigurationFileLoader
+        arguments:
+            - '.phpstan/return-types-exclusions.php'
+
+    typeHintsForNewMethodsRuleConfigurationFileLoader:
+        class: PHPStanForPrestaShop\PHPConfigurationLoader\PHPConfigurationFileLoader
+        arguments:
+            - '.phpstan/type-hints-exclusions.php'
