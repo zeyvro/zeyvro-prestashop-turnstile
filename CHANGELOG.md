@@ -3,6 +3,10 @@
 All notable changes to zeyvro-prestashop-turnstile are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) — [Semantic Versioning](https://semver.org/).
 
+## [1.0.5] - 2026-06-12
+### Fixed
+- fix: class naming PS8 coreLoadModule — el módulo no instalaba en PS8 (exit 255, `get_parent_class(): bool` en `ModuleRepository.php:252`). Clase principal renombrada `ZeyvroTurnstile` → `Zeyvro_Turnstile`: PS8 hace `class_exists()` con el nombre literal del módulo, y al llevar el name underscore la clase debe llevarlo también (patrón oficial `Ps_Emailsubscription`). **v1.0.4 y anteriores no instalan en PrestaShop 8 — actualizar.**
+
 ## [1.0.4] - 2026-06-04
 ### Fixed
 - `AdminZeyvroTurnstileController`: referencia a clase `Zeyvroturnstile::CONFIG_KEYS` corregida a `ZeyvroTurnstile::CONFIG_KEYS` (PHPStan — clase inexistente).

@@ -11,7 +11,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class ZeyvroTurnstile extends Module
+class Zeyvro_Turnstile extends Module
 {
     const CONFIG_KEYS = [
         'ZEYVRO_TURNSTILE_ENABLED',
@@ -27,7 +27,7 @@ class ZeyvroTurnstile extends Module
     {
         $this->name          = 'zeyvro_turnstile';
         $this->tab           = 'other';
-        $this->version       = '1.0.4';
+        $this->version       = '1.0.5';
         $this->author        = 'Zeyvro';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => _PS_VERSION_];

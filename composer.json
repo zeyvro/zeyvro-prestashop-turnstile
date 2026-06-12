@@ -1,6 +1,6 @@
 {
     "name": "zeyvro/zeyvroturnstile",
-    "description": "ZeyvroTurnstile - Cloudflare Turnstile CAPTCHA para PrestaShop",
+    "description": "Zeyvro_Turnstile - Cloudflare Turnstile CAPTCHA para PrestaShop",
     "type": "prestashop-module",
     "license": "proprietary",
     "require": {
