@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.6 — 2026-06-13
+
+### Añadido
+- §7.1 Auto-upgrade al subir ZIP por BO: `runAutoUpgrade()` en `__construct()` — detecta versión instalada vía `ZEYVROTURNSTILE_VERSION` / tabla `ps_module`, lee destino de `config.xml`, ejecuta upgrade scripts intermedios en orden semver, actualiza BD automáticamente.
+- §2.1 `clearAllCaches()`: OPcache + Smarty + CCC + autoload. `try/catch \Throwable` (PHP 8.0 safe).
+- `upgrade/upgrade-1.0.6.php`: idempotente.
+
 All notable changes to zeyvro-prestashop-turnstile are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) — [Semantic Versioning](https://semver.org/).
 

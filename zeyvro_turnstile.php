@@ -27,7 +27,7 @@ class Zeyvro_Turnstile extends Module
     {
         $this->name          = 'zeyvro_turnstile';
         $this->tab           = 'other';
-        $this->version       = '1.0.5';
+        $this->version       = '1.0.6';
         $this->author        = 'Zeyvro';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => _PS_VERSION_];
@@ -37,6 +37,11 @@ class Zeyvro_Turnstile extends Module
 
         $this->displayName = $this->l('Zeyvro Turnstile');
         $this->description = $this->l('Anti-spam protection with Cloudflare Turnstile on the PrestaShop contact form.');
+
+        // §7.1 — Auto-upgrade al subir ZIP por BO
+        if (defined('_PS_ADMIN_DIR_') && !defined('ZEYVROTURNSTILE_UPGRADING')) {
+            $this->runAutoUpgrade();
+        }
     }
 
     /* =====================================================================
@@ -45,13 +50,17 @@ class Zeyvro_Turnstile extends Module
 
     public function install(): bool
     {
-        return parent::install()
+        $ok = parent::install()
             && $this->installTab()
             && $this->installSql()
             && $this->installConfig()
             && $this->registerHook('displayHeader')
             && $this->registerHook('displayBeforeBodyClosingTag')
             && $this->registerHook('actionFrontControllerSetMedia');
+        if ($ok) {
+            $this->clearAllCaches();
+        }
+        return $ok;
     }
 
     public function uninstall(): bool
@@ -334,5 +343,80 @@ class Zeyvro_Turnstile extends Module
             'score'       => $result['score'] !== null ? (float) $result['score'] : null,
             'error_codes' => $errorCodes !== null ? pSQL($errorCodes) : null,
         ]);
+    }
+
+    // ─── AUTO-UPGRADE §7.1 ───────────────────────────────────────────────────
+
+    private function runAutoUpgrade(): void
+    {
+        try {
+            $installed = (string) Configuration::get('ZEYVROTURNSTILE_VERSION');
+            if (!$installed || !preg_match('/^\d+\.\d+\.\d+$/', $installed)) {
+                $installed = (string) Db::getInstance()->getValue(
+                    'SELECT `version` FROM `' . _DB_PREFIX_ . 'module`
+                     WHERE `name` = "zeyvro_turnstile"'
+                );
+            }
+            if (!$installed || !preg_match('/^\d+\.\d+\.\d+$/', $installed)) {
+                return;
+            }
+            $xmlPath = dirname(__FILE__) . '/config.xml';
+            if (!file_exists($xmlPath)) { return; }
+            $xml = @simplexml_load_file($xmlPath);
+            if (!$xml) { return; }
+            $target = (string) $xml->version;
+            if (!preg_match('/^\d+\.\d+\.\d+$/', $target)) { return; }
+            if (version_compare($installed, $target, '>=')) { return; }
+            define('ZEYVROTURNSTILE_UPGRADING', true);
+            $scripts = glob(dirname(__FILE__) . '/upgrade/upgrade-*.php');
+            if ($scripts) {
+                usort($scripts, function ($a, $b) {
+                    $va = preg_replace('/.*upgrade-(.+)\.php$/', '$1', $a);
+                    $vb = preg_replace('/.*upgrade-(.+)\.php$/', '$1', $b);
+                    return version_compare($va, $vb);
+                });
+                foreach ($scripts as $script) {
+                    $sv = preg_replace('/.*upgrade-(.+)\.php$/', '$1', $script);
+                    if (version_compare($sv, $installed, '>') && version_compare($sv, $target, '<=')) {
+                        include_once $script;
+                        $fn = 'upgrade_module_' . str_replace('.', '_', $sv);
+                        if (function_exists($fn) && !$fn($this)) {
+                            PrestaShopLogger::addLog(
+                                'zeyvro_turnstile: upgrade script ' . $sv . ' failed',
+                                3, null, 'zeyvro_turnstile', 0, true
+                            );
+                            return;
+                        }
+                    }
+                }
+            }
+            Configuration::updateValue('ZEYVROTURNSTILE_VERSION', $target);
+            Db::getInstance()->execute(
+                'UPDATE `' . _DB_PREFIX_ . 'module` SET `version` = "' . pSQL($target) . '"
+                 WHERE `name` = "zeyvro_turnstile"'
+            );
+            $this->clearAllCaches();
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog(
+                'zeyvro_turnstile auto-upgrade error: ' . $e->getMessage(),
+                3, null, 'zeyvro_turnstile', 0, true
+            );
+        }
+    }
+
+    public function clearAllCaches(): void
+    {
+        try {
+            if (function_exists('opcache_reset')) {
+                @opcache_reset();
+            }
+            @Tools::clearSmartyCache();
+            @Media::clearCache();
+            if (class_exists('PrestaShopAutoload')) {
+                @PrestaShopAutoload::getInstance()->generateIndex();
+            }
+        } catch (\Throwable $t) {
+            // best-effort — never break install/upgrade
+        }
     }
 }
