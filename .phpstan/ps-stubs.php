@@ -119,6 +119,7 @@ class Tools {
     public static function strpos(string $haystack, string $needle, int $offset = 0): int|false { return strpos($haystack, $needle, $offset); }
     public static function htmlentitiesUTF8(string $str): string { return ''; }
     public static function htmlentitiesDecodeUTF8(string $str): string { return ''; }
+    public static function clearSmartyCache(): void {}
 }
 
 class Validate {
@@ -190,6 +191,7 @@ class Shop {
 class Db {
     public static function getInstance(bool $slave = false): static { return new static; }
     public function execute(string $sql, bool $use_cache = true): bool { return false; }
+    public function getValue(string $sql, bool $use_cache = true): mixed { return false; }
 }
 
 class Tab extends ObjectModel {
@@ -256,6 +258,7 @@ class Currency {
 class Media {
     public static function getCSSPath(string $file_name, string $type = 'all', bool $check_path = true): string { return ''; }
     public static function getJSPath(string $file_name): string { return ''; }
+    public static function clearCache(): void {}
 }
 class Product extends ObjectModel {
     public string $name = '';
@@ -279,3 +282,7 @@ if (!defined('__PS_BASE_URI__')) {
     define('__PS_BASE_URI__', '/');
 }
 
+class PrestaShopAutoload {
+    public static function getInstance(): static { return new static; }
+    public function generateIndex(): void {}
+}
