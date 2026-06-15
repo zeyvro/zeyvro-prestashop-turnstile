@@ -2,7 +2,7 @@
 <module>
     <name>zeyvro_turnstile</name>
     <displayName><![CDATA[Turnstile Anti-Spam]]></displayName>
-    <version><![CDATA[1.0.6]]></version>
+    <version><![CDATA[1.0.7]]></version>
     <description><![CDATA[Protecci&oacute;n anti-spam con Cloudflare Turnstile en el formulario de contacto.]]></description>
     <author><![CDATA[Zeyvro]]></author>
     <tab><![CDATA[other]]></tab>
