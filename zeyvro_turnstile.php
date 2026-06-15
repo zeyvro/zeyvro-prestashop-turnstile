@@ -73,76 +73,78 @@ class Zeyvro_Turnstile extends Module
 
     private function installTab(): bool
     {
-        // Tab "Zeyvro" directamente en PERSONALIZAR, mismo nivel que Internacional
-        $idLocalization = (int) Tab::getIdFromClassName('AdminParentLocalization');
-        $idSection      = 0;
-        if ($idLocalization > 0) {
-            $locTab    = new Tab($idLocalization);
-            $idSection = (int) $locTab->id_parent;
+        // 1. Crear/reusar parent "Zeyvro" bajo IMPROVE (canon zeyvroseoredirect)
+        $id_parent = (int) Tab::getIdFromClassName('AdminZeyvroParent');
+        if (!$id_parent) {
+            $parent = new Tab();
+            $parent->active = 1;
+            $parent->class_name = 'AdminZeyvroParent';
+            $parent->name = [];
+            foreach (Language::getLanguages(true) as $lang) {
+                $parent->name[$lang['id_lang']] = 'Zeyvro';
+            }
+            $parent->id_parent = (int) Tab::getIdFromClassName('IMPROVE')
+                ?: (int) Tab::getIdFromClassName('AdminParentModulesSf');
+            $parent->module = '';  // compartido entre módulos Zeyvro — NUNCA module=$this->name
+            $parent->icon = 'tune';
+            if (!$parent->add()) {
+                return false;
+            }
+            $id_parent = (int) $parent->id;
+            $this->createTabRoles('AdminZeyvroParent');
+        } else {
+            // Normalizar module='' si otro módulo Zeyvro lo creó con su nombre
+            Db::getInstance()->execute(
+                'UPDATE `' . _DB_PREFIX_ . 'tab` SET `module` = ""
+                 WHERE `id_tab` = ' . $id_parent . ' AND `module` != ""'
+            );
         }
 
-        $idTab = (int) Tab::getIdFromClassName('AdminZeyvroTurnstile');
-        if ($idTab > 0) {
-            // Ya existe: actualizar padre y nombre si es necesario
-            $tab = new Tab($idTab);
-            $needsSave = false;
-            if ((int) $tab->id_parent !== $idSection) {
-                $tab->id_parent = $idSection;
-                $needsSave = true;
-            }
-            foreach (Language::getLanguages(false) as $lang) {
-                if ($tab->name[$lang['id_lang']] !== 'Zeyvro') {
-                    $tab->name[$lang['id_lang']] = 'Zeyvro';
-                    $needsSave = true;
-                }
-            }
-            if ($needsSave) {
-                $tab->save();
-            }
+        // 2. Crear child tab si no existe
+        $id_child = (int) Tab::getIdFromClassName('AdminZeyvroTurnstile');
+        if ($id_child) {
             return true;
         }
-
-        $tab             = new Tab();
-        $tab->active     = 1;
+        $tab = new Tab();
+        $tab->active = 1;
         $tab->class_name = 'AdminZeyvroTurnstile';
-        $tab->module     = $this->name;
-        $tab->id_parent  = $idSection;
-        $tab->icon       = 'extension';
-        foreach (Language::getLanguages(false) as $lang) {
-            $tab->name[$lang['id_lang']] = 'Zeyvro';
+        $tab->name = [];
+        foreach (Language::getLanguages(true) as $lang) {
+            $tab->name[$lang['id_lang']] = 'Anti SPAM';
         }
+        $tab->id_parent = $id_parent;
+        $tab->module = $this->name;
+        $tab->icon = 'verified_user';
         if (!$tab->add()) {
             return false;
         }
-        $this->grantTabPermissions('AdminZeyvroTurnstile');
+        $this->createTabRoles('AdminZeyvroTurnstile');
         return true;
     }
 
-    private function grantTabPermissions(string $className): void
+    private function createTabRoles(string $class_name): void
     {
-        $db     = Db::getInstance();
-        $ucName = strtoupper($className);
-
-        foreach (['READ', 'UPDATE', 'CREATE', 'DELETE', 'VIEW', 'ADD', 'EDIT'] as $sfx) {
-            $db->execute(
-                "INSERT IGNORE INTO `" . _DB_PREFIX_ . "authorization_role` (`slug`)
-                 VALUES ('" . pSQL($className . '_' . $sfx) . "')"
+        $actions = ['CREATE', 'READ', 'UPDATE', 'DELETE'];
+        $slug_prefix = 'ROLE_MOD_TAB_' . Tools::strtoupper($class_name) . '_';
+        foreach ($actions as $action) {
+            $slug = $slug_prefix . $action;
+            Db::getInstance()->execute(
+                'INSERT IGNORE INTO `' . _DB_PREFIX_ . 'authorization_role` (`slug`)
+                 VALUES ("' . pSQL($slug) . '")'
             );
-        }
-        foreach (['READ', 'CREATE', 'UPDATE', 'DELETE'] as $sfx) {
-            $db->execute(
-                "INSERT IGNORE INTO `" . _DB_PREFIX_ . "authorization_role` (`slug`)
-                 VALUES ('" . pSQL('ROLE_MOD_TAB_' . $ucName . '_' . $sfx) . "')"
+            $id_role = (int) Db::getInstance()->getValue(
+                'SELECT `id_authorization_role`
+                 FROM `' . _DB_PREFIX_ . 'authorization_role`
+                 WHERE `slug` = "' . pSQL($slug) . '"'
             );
+            if ($id_role) {
+                Db::getInstance()->execute(
+                    'INSERT IGNORE INTO `' . _DB_PREFIX_ . 'access`
+                     (`id_profile`, `id_authorization_role`)
+                     VALUES (1, ' . $id_role . ')'
+                );
+            }
         }
-        $db->execute("
-            INSERT IGNORE INTO `" . _DB_PREFIX_ . "access` (`id_profile`, `id_authorization_role`)
-            SELECT p.id_profile, r.id_authorization_role
-            FROM `" . _DB_PREFIX_ . "profile` p
-            CROSS JOIN `" . _DB_PREFIX_ . "authorization_role` r
-            WHERE r.slug LIKE '" . pSQL($className) . "_%'
-               OR r.slug LIKE 'ROLE_MOD_TAB_" . pSQL($ucName) . "_%'
-        ");
     }
 
     private function uninstallTab(): bool
@@ -151,12 +153,14 @@ class Zeyvro_Turnstile extends Module
         if ($id) {
             (new Tab($id))->delete();
         }
-        // Borrar grupo Zeyvro solo si ya no tiene hijos (otros módulos zeyvro)
-        $idGroup = (int) Tab::getIdFromClassName('AdminZeyvroGroup');
-        if ($idGroup > 0) {
-            $children = Tab::getNbTabs($idGroup);
+        // Borrar parent solo si no quedan otros hijos (otros módulos Zeyvro)
+        $id_parent = (int) Tab::getIdFromClassName('AdminZeyvroParent');
+        if ($id_parent) {
+            $children = (int) Db::getInstance()->getValue(
+                'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'tab` WHERE `id_parent` = ' . $id_parent
+            );
             if ($children === 0) {
-                (new Tab($idGroup))->delete();
+                (new Tab($id_parent))->delete();
             }
         }
         return true;

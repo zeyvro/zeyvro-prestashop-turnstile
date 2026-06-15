@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.7 — 2026-06-15
+
+### Fixed
+- Menú BO: sustituido patrón incorrecto (AdminParentLocalization / AdminZeyvroGroup) por el canónico `AdminZeyvroParent` bajo IMPROVE — tab aparece ahora en PERSONALIZAR → Zeyvro → Anti SPAM junto a SEO Redirects.
+- `installTab()` reescrito: crea/reusa `AdminZeyvroParent` con `module=''` (compartido), hijo `AdminZeyvroTurnstile` con nombre "Anti SPAM" e icono `verified_user`.
+- `uninstallTab()` corregido: borra el child y el parent solo si no quedan otros hijos (respeta instalación conjunta con seoredirect).
+- `createTabRoles()` canónico (ROLE_MOD_TAB_*) en lugar de `grantTabPermissions()`.
+- `config_es.xml` sincronizado a 1.0.7 (antes en 1.0.6).
+
+### Añadido
+- `upgrade/upgrade-1.0.7.php`: reparación idempotente del estado en demo — elimina AdminZeyvroGroup, consolida AdminZeyvroParent bajo IMPROVE, mueve/crea AdminZeyvroTurnstile con nombre correcto, crea roles ×4.
+
 ## 1.0.6 — 2026-06-13
 
 ### Añadido
