@@ -100,7 +100,14 @@ class Zeyvro_Turnstile extends Module
         }
 
         // --- Tab hijo "Anti SPAM" bajo el grupo Zeyvro ---
-        if ((int) Tab::getIdFromClassName('AdminZeyvroTurnstile') > 0) {
+        $idTab = (int) Tab::getIdFromClassName('AdminZeyvroTurnstile');
+        if ($idTab > 0) {
+            // Tab ya existe: moverlo al grupo Zeyvro si está en otro padre
+            $tab = new Tab($idTab);
+            if ((int) $tab->id_parent !== $idGroup) {
+                $tab->id_parent = $idGroup;
+                $tab->save();
+            }
             return true;
         }
 
