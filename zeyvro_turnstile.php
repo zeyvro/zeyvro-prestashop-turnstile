@@ -73,21 +73,42 @@ class Zeyvro_Turnstile extends Module
 
     private function installTab(): bool
     {
-        // Idempotente: si el tab ya existe no crear duplicado.
-        if ((int) Tab::getIdFromClassName('AdminZeyvroTurnstile') > 0) {
-            return true;
+        // --- Grupo padre "Zeyvro" en sección PERSONALIZAR (mismo nivel que Internacional) ---
+        $idGroup = (int) Tab::getIdFromClassName('AdminZeyvroGroup');
+        if ($idGroup <= 0) {
+            // Buscar el id_parent de Internacional para quedarnos en la misma sección
+            $idLocalization = (int) Tab::getIdFromClassName('AdminParentLocalization');
+            $idSection      = 0;
+            if ($idLocalization > 0) {
+                $locTab    = new Tab($idLocalization);
+                $idSection = (int) $locTab->id_parent;
+            }
+
+            $group             = new Tab();
+            $group->active     = 1;
+            $group->class_name = 'AdminZeyvroGroup';
+            $group->module     = $this->name;
+            $group->id_parent  = $idSection;
+            $group->icon       = 'extension';
+            foreach (Language::getLanguages(false) as $lang) {
+                $group->name[$lang['id_lang']] = 'Zeyvro';
+            }
+            if (!$group->add()) {
+                return false;
+            }
+            $idGroup = (int) $group->id;
         }
 
-        $idParent = (int) Tab::getIdFromClassName('AdminParentCustomerThreads');
-        if ($idParent <= 0) {
-            $idParent = -1;
+        // --- Tab hijo "Anti SPAM" bajo el grupo Zeyvro ---
+        if ((int) Tab::getIdFromClassName('AdminZeyvroTurnstile') > 0) {
+            return true;
         }
 
         $tab             = new Tab();
         $tab->active     = 1;
         $tab->class_name = 'AdminZeyvroTurnstile';
         $tab->module     = $this->name;
-        $tab->id_parent  = $idParent;
+        $tab->id_parent  = $idGroup;
         foreach (Language::getLanguages(false) as $lang) {
             $tab->name[$lang['id_lang']] = 'Anti SPAM';
         }
@@ -130,6 +151,14 @@ class Zeyvro_Turnstile extends Module
         $id = (int) Tab::getIdFromClassName('AdminZeyvroTurnstile');
         if ($id) {
             (new Tab($id))->delete();
+        }
+        // Borrar grupo Zeyvro solo si ya no tiene hijos (otros módulos zeyvro)
+        $idGroup = (int) Tab::getIdFromClassName('AdminZeyvroGroup');
+        if ($idGroup > 0) {
+            $children = Tab::getNbTabs($idGroup);
+            if ($children === 0) {
+                (new Tab($idGroup))->delete();
+            }
         }
         return true;
     }
