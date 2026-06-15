@@ -24,6 +24,10 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+// Guard: varios módulos Zeyvro copian este fichero; PHP solo puede declarar
+// el trait una vez por proceso, así que el segundo require_once da Fatal Error
+// sin esta protección.
+if (!trait_exists('ZeyvroModuleTrait', false)) :
 trait ZeyvroModuleTrait
 {
     /* =========================================================================
@@ -360,3 +364,4 @@ trait ZeyvroModuleTrait
         return $branding . $grid . '</div>';
     }
 }
+endif; // trait_exists guard
