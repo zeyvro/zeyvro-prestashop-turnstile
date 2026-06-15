@@ -1,18 +1,32 @@
-﻿<?php
+<?php
 /**
  * Zeyvro — Turnstile Anti-Spam
- * Cloudflare Turnstile en el formulario de contacto de PrestaShop 8.
+ * Cloudflare Turnstile on the PrestaShop 8 contact form.
  *
- * @author  Zeyvro
+ * @author  Zeyvro <hola@zeyvro.com>
  * @license MIT
+ * @link    https://zeyvro.com
  */
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require_once dirname(__FILE__) . '/classes/ZeyvroModuleTrait.php';
+
 class Zeyvro_Turnstile extends Module
 {
+    use ZeyvroModuleTrait;
+
+    // ── Base común: constantes de identidad ───────────────────────────────
+    const ZV_TAB_CLASS   = 'AdminZeyvroTurnstile';
+    const ZV_TAB_NAME    = 'Anti SPAM';
+    const ZV_TAB_ICON    = 'verified_user';
+    const ZV_ADS_VARIANT = 'free';
+    const ZV_SCHEMA_TABV = 'A';               // cambiar solo si la estructura de tabs cambia
+    const ZV_SCHEMA_KEY  = 'ZEYVROTURNSTILE_TABV';
+
+    // ── Config keys propios del módulo ────────────────────────────────────
     const CONFIG_KEYS = [
         'ZEYVRO_TURNSTILE_ENABLED',
         'ZEYVRO_TURNSTILE_SITE_KEY',
@@ -27,7 +41,7 @@ class Zeyvro_Turnstile extends Module
     {
         $this->name          = 'zeyvro_turnstile';
         $this->tab           = 'other';
-        $this->version = '1.0.7';
+        $this->version       = '1.0.8';
         $this->author        = 'Zeyvro';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => _PS_VERSION_];
@@ -36,7 +50,9 @@ class Zeyvro_Turnstile extends Module
         parent::__construct();
 
         $this->displayName = $this->l('Zeyvro Turnstile');
-        $this->description = $this->l('Anti-spam protection with Cloudflare Turnstile on the PrestaShop contact form.');
+        $this->description = $this->l(
+            'Anti-spam protection with Cloudflare Turnstile on the PrestaShop contact form.'
+        );
 
         // §7.1 — Auto-upgrade al subir ZIP por BO
         if (defined('_PS_ADMIN_DIR_') && !defined('ZEYVROTURNSTILE_UPGRADING')) {
@@ -50,120 +66,24 @@ class Zeyvro_Turnstile extends Module
 
     public function install(): bool
     {
-        $ok = parent::install()
-            && $this->installTab()
+        return parent::install()
+            && $this->installBase()             // trait: hook auto-reparación + ensureTabs + clearAllCaches
             && $this->installSql()
             && $this->installConfig()
             && $this->registerHook('displayHeader')
             && $this->registerHook('displayBeforeBodyClosingTag')
             && $this->registerHook('actionFrontControllerSetMedia');
-        if ($ok) {
-            $this->clearAllCaches();
-        }
-        return $ok;
     }
 
     public function uninstall(): bool
     {
-        return parent::uninstall()
-            && $this->uninstallTab()
-            && $this->uninstallSql()
-            && $this->uninstallConfig();
-    }
-
-    private function installTab(): bool
-    {
-        // 1. Crear/reusar parent "Zeyvro" bajo IMPROVE (canon zeyvroseoredirect)
-        $id_parent = (int) Tab::getIdFromClassName('AdminZeyvroParent');
-        if (!$id_parent) {
-            $parent = new Tab();
-            $parent->active = 1;
-            $parent->class_name = 'AdminZeyvroParent';
-            $parent->name = [];
-            foreach (Language::getLanguages(true) as $lang) {
-                $parent->name[$lang['id_lang']] = 'Zeyvro';
-            }
-            $parent->id_parent = (int) Tab::getIdFromClassName('IMPROVE')
-                ?: (int) Tab::getIdFromClassName('AdminParentModulesSf');
-            $parent->module = '';  // compartido entre módulos Zeyvro — NUNCA module=$this->name
-            $parent->icon = 'tune';
-            if (!$parent->add()) {
-                return false;
-            }
-            $id_parent = (int) $parent->id;
-            $this->createTabRoles('AdminZeyvroParent');
-        } else {
-            // Normalizar module='' si otro módulo Zeyvro lo creó con su nombre
-            Db::getInstance()->execute(
-                'UPDATE `' . _DB_PREFIX_ . 'tab` SET `module` = ""
-                 WHERE `id_tab` = ' . $id_parent . ' AND `module` != ""'
-            );
-        }
-
-        // 2. Crear child tab si no existe
-        $id_child = (int) Tab::getIdFromClassName('AdminZeyvroTurnstile');
-        if ($id_child) {
-            return true;
-        }
-        $tab = new Tab();
-        $tab->active = 1;
-        $tab->class_name = 'AdminZeyvroTurnstile';
-        $tab->name = [];
-        foreach (Language::getLanguages(true) as $lang) {
-            $tab->name[$lang['id_lang']] = 'Anti SPAM';
-        }
-        $tab->id_parent = $id_parent;
-        $tab->module = $this->name;
-        $tab->icon = 'verified_user';
-        if (!$tab->add()) {
-            return false;
-        }
-        $this->createTabRoles('AdminZeyvroTurnstile');
-        return true;
-    }
-
-    private function createTabRoles(string $class_name): void
-    {
-        $actions = ['CREATE', 'READ', 'UPDATE', 'DELETE'];
-        $slug_prefix = 'ROLE_MOD_TAB_' . Tools::strtoupper($class_name) . '_';
-        foreach ($actions as $action) {
-            $slug = $slug_prefix . $action;
-            Db::getInstance()->execute(
-                'INSERT IGNORE INTO `' . _DB_PREFIX_ . 'authorization_role` (`slug`)
-                 VALUES ("' . pSQL($slug) . '")'
-            );
-            $id_role = (int) Db::getInstance()->getValue(
-                'SELECT `id_authorization_role`
-                 FROM `' . _DB_PREFIX_ . 'authorization_role`
-                 WHERE `slug` = "' . pSQL($slug) . '"'
-            );
-            if ($id_role) {
-                Db::getInstance()->execute(
-                    'INSERT IGNORE INTO `' . _DB_PREFIX_ . 'access`
-                     (`id_profile`, `id_authorization_role`)
-                     VALUES (1, ' . $id_role . ')'
-                );
-            }
-        }
-    }
-
-    private function uninstallTab(): bool
-    {
-        $id = (int) Tab::getIdFromClassName('AdminZeyvroTurnstile');
-        if ($id) {
-            (new Tab($id))->delete();
-        }
-        // Borrar parent solo si no quedan otros hijos (otros módulos Zeyvro)
-        $id_parent = (int) Tab::getIdFromClassName('AdminZeyvroParent');
-        if ($id_parent) {
-            $children = (int) Db::getInstance()->getValue(
-                'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'tab` WHERE `id_parent` = ' . $id_parent
-            );
-            if ($children === 0) {
-                (new Tab($id_parent))->delete();
-            }
-        }
-        return true;
+        // PRESERVATIVO: tablas, configuración y datos sobreviven.
+        // Para limpieza completa: ver sql/uninstall.sql (acción manual documentada).
+        $this->uninstallBase();                 // trait: zvUninstallTab + unregister auto-reparación
+        $this->unregisterHook('displayHeader');
+        $this->unregisterHook('displayBeforeBodyClosingTag');
+        $this->unregisterHook('actionFrontControllerSetMedia');
+        return parent::uninstall();
     }
 
     private function installSql(): bool
@@ -183,13 +103,6 @@ class Zeyvro_Turnstile extends Module
         ");
     }
 
-    private function uninstallSql(): bool
-    {
-        return Db::getInstance()->execute(
-            "DROP TABLE IF EXISTS `" . _DB_PREFIX_ . "zeyvro_turnstile_log`"
-        );
-    }
-
     private function installConfig(): bool
     {
         $defaults = [
@@ -207,14 +120,6 @@ class Zeyvro_Turnstile extends Module
         return true;
     }
 
-    private function uninstallConfig(): bool
-    {
-        foreach (self::CONFIG_KEYS as $k) {
-            Configuration::deleteByName($k);
-        }
-        return true;
-    }
-
     public function getContent()
     {
         Tools::redirectAdmin(
@@ -223,12 +128,11 @@ class Zeyvro_Turnstile extends Module
     }
 
     /* =====================================================================
-     * HOOKS
+     * HOOKS — Cloudflare Turnstile
      * =================================================================== */
 
     /**
-     * Carga el script de la API de Turnstile solo en la página de contacto.
-     * Se emite dentro de <head> para mayor rendimiento.
+     * Inyecta el script de la API de Turnstile solo en la página de contacto.
      */
     public function hookDisplayHeader($params)
     {
@@ -249,7 +153,6 @@ class Zeyvro_Turnstile extends Module
 
     /**
      * Inyecta el widget Turnstile en el formulario de contacto vía JS.
-     * Usa displayBeforeBodyClosingTag para asegurar que el DOM del form ya existe.
      */
     public function hookDisplayBeforeBodyClosingTag($params)
     {
@@ -276,9 +179,7 @@ class Zeyvro_Turnstile extends Module
     }
 
     /**
-     * Validación server-side del token Turnstile.
-     * Se dispara en setMedia(), antes de initContent() donde contactform
-     * llama a sendMessage(). Los errores añadidos aquí son vistos por sendMessage().
+     * Validación server-side del token Turnstile en el formulario de contacto.
      */
     public function hookActionFrontControllerSetMedia($params)
     {
@@ -307,13 +208,13 @@ class Zeyvro_Turnstile extends Module
         if (!$result['success']
             && Configuration::get('ZEYVRO_TURNSTILE_ACTION_ON_FAIL') !== 'log_only') {
             $this->context->controller->errors[] = $this->l(
-                'La verificación de seguridad no se completó. Por favor, inténtalo de nuevo.'
+                'Security verification failed. Please try again.'
             );
         }
     }
 
     /* =====================================================================
-     * PRIVADOS
+     * PRIVADOS — Cloudflare
      * =================================================================== */
 
     private function verifyCloudflareTurnstile(string $secret, string $token, string $remoteIp): array
@@ -342,11 +243,7 @@ class Zeyvro_Turnstile extends Module
         curl_close($ch);
 
         if ($response === false || !empty($curlError)) {
-            PrestaShopLogger::addLog(
-                '[zeyvro_turnstile] cURL error: ' . $curlError,
-                3
-            );
-            // Fallo de red → bloquear por defecto (fail-safe)
+            PrestaShopLogger::addLog('[zeyvro_turnstile] cURL error: ' . $curlError, 3);
             return ['success' => false, 'error_codes' => ['network-error'], 'score' => null];
         }
 
@@ -380,7 +277,9 @@ class Zeyvro_Turnstile extends Module
         ]);
     }
 
-    // ─── AUTO-UPGRADE §7.1 ───────────────────────────────────────────────────
+    /* =====================================================================
+     * AUTO-UPGRADE §7.1
+     * =================================================================== */
 
     private function runAutoUpgrade(): void
     {
@@ -396,12 +295,20 @@ class Zeyvro_Turnstile extends Module
                 return;
             }
             $xmlPath = dirname(__FILE__) . '/config.xml';
-            if (!file_exists($xmlPath)) { return; }
+            if (!file_exists($xmlPath)) {
+                return;
+            }
             $xml = @simplexml_load_file($xmlPath);
-            if (!$xml) { return; }
+            if (!$xml) {
+                return;
+            }
             $target = (string) $xml->version;
-            if (!preg_match('/^\d+\.\d+\.\d+$/', $target)) { return; }
-            if (version_compare($installed, $target, '>=')) { return; }
+            if (!preg_match('/^\d+\.\d+\.\d+$/', $target)) {
+                return;
+            }
+            if (version_compare($installed, $target, '>=')) {
+                return;
+            }
             define('ZEYVROTURNSTILE_UPGRADING', true);
             $scripts = glob(dirname(__FILE__) . '/upgrade/upgrade-*.php');
             if ($scripts) {
@@ -430,29 +337,13 @@ class Zeyvro_Turnstile extends Module
                 'UPDATE `' . _DB_PREFIX_ . 'module` SET `version` = "' . pSQL($target) . '"
                  WHERE `name` = "zeyvro_turnstile"'
             );
-            $this->installTab();
+            $this->ensureTabs();
             $this->clearAllCaches();
         } catch (\Exception $e) {
             PrestaShopLogger::addLog(
                 'zeyvro_turnstile auto-upgrade error: ' . $e->getMessage(),
                 3, null, 'zeyvro_turnstile', 0, true
             );
-        }
-    }
-
-    public function clearAllCaches(): void
-    {
-        try {
-            if (function_exists('opcache_reset')) {
-                @opcache_reset();
-            }
-            @Tools::clearSmartyCache();
-            @Media::clearCache();
-            if (class_exists('PrestaShopAutoload')) {
-                @PrestaShopAutoload::getInstance()->generateIndex();
-            }
-        } catch (\Throwable $t) {
-            // best-effort — never break install/upgrade
         }
     }
 }
