@@ -112,6 +112,7 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
             'clear_url'       => $this->context->link->getAdminLink('AdminZeyvroTurnstile') . '&clearOldLogs=1',
             'confirmations'   => $this->confirmations,
             'errors'          => $this->errors,
+            'zeyvro_ads'      => $this->module->renderZeyvroAds(),
         ]);
 
         $content = $this->context->smarty->fetch($tplDir . 'settings.tpl');
