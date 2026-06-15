@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Zeyvro — Turnstile Anti-Spam
  * Cloudflare Turnstile en el formulario de contacto de PrestaShop 8.
@@ -73,10 +73,13 @@ class Zeyvro_Turnstile extends Module
 
     private function installTab(): bool
     {
+        // Idempotente: si el tab ya existe no crear duplicado.
+        if ((int) Tab::getIdFromClassName('AdminZeyvroTurnstile') > 0) {
+            return true;
+        }
+
         $idParent = (int) Tab::getIdFromClassName('AdminParentCustomerThreads');
         if ($idParent <= 0) {
-            // Fallback defensivo: si el menú padre no existe (instalación atípica),
-            // dejamos la tab oculta para no romper la instalación.
             $idParent = -1;
         }
 
@@ -395,6 +398,7 @@ class Zeyvro_Turnstile extends Module
                 'UPDATE `' . _DB_PREFIX_ . 'module` SET `version` = "' . pSQL($target) . '"
                  WHERE `name` = "zeyvro_turnstile"'
             );
+            $this->installTab();
             $this->clearAllCaches();
         } catch (\Exception $e) {
             PrestaShopLogger::addLog(
