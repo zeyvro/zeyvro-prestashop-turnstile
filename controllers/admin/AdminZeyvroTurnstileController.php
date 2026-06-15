@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * AdminZeyvroTurnstileController
  * Settings panel and log for zeyvro_turnstile module.
@@ -61,7 +61,7 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
             $failAction = 'block';
         }
 
-        $secretFields = ['ZEYVRO_TURNSTILE_SECRET_KEY'];
+        $secretFields = ['ZEYVRO_TURNSTILE_SECRET_KEY', 'ZEYVRO_TURNSTILE_SITE_KEY'];
 
         foreach ($map as $key => $type) {
             $val = Tools::getValue($key);
@@ -133,11 +133,11 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
                 'desc'    => $this->l('Desactívalo para deshabilitar temporalmente sin desinstalar.'),
             ],
             [
-                'type'     => 'text',
+                'type'     => 'password',
                 'label'    => $this->l('Site Key'),
                 'name'     => 'ZEYVRO_TURNSTILE_SITE_KEY',
                 'required' => true,
-                'desc'     => $this->l('Clave pública del widget (dash.cloudflare.com → Turnstile → tu sitio).'),
+                'desc'     => $this->l('Clave pública del widget. Deja en blanco al guardar para conservar el valor actual.'),
             ],
             [
                 'type'     => 'password',
