@@ -77,3 +77,17 @@
     </small>
   </div>
 </div>
+
+<div style="display:flex;align-items:center;gap:20px;padding:18px 24px;margin-top:20px;background:#111;border-radius:4px;">
+  <span style="font-size:20px;font-weight:700;color:#fff;letter-spacing:-.03em;white-space:nowrap;flex-shrink:0;">zeyvro</span>
+  <div style="width:1px;height:32px;background:rgba(255,255,255,.15);flex-shrink:0;"></div>
+  <div style="flex:1;">
+    <strong style="font-size:13px;font-weight:600;color:#fff;display:block;margin-bottom:4px;">{l s='Hay más por descubrir' mod='zeyvro_turnstile'}</strong>
+    <span style="font-size:12px;color:rgba(255,255,255,.75);display:block;margin-bottom:3px;">{l s='Cada módulo, pensado hasta el último detalle.' mod='zeyvro_turnstile'}</span>
+    <span style="font-size:12px;color:rgba(255,255,255,.4);">{l s='Módulos para PrestaShop construidos con la misma filosofía.' mod='zeyvro_turnstile'}</span>
+  </div>
+  <a href="https://zeyvro.com" target="_blank" rel="noopener"
+     style="font-size:12px;font-weight:600;padding:7px 16px;border-radius:4px;background:#fff;color:#111;text-decoration:none;white-space:nowrap;flex-shrink:0;">
+    zeyvro.com &rarr;
+  </a>
+</div>
