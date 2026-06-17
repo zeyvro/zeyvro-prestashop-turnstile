@@ -13,10 +13,6 @@ desktop.ini
 # IDEs
 .idea/
 
-
-
-
-
 # Backups y temporales
 *.bak
 *.bak_*
@@ -34,8 +30,3 @@ vendor/
 composer.lock
 node_modules/
 package-lock.json
-
-
-
-
-
