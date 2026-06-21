@@ -22,8 +22,9 @@ class Zeyvro_Turnstile extends Module
     const ZV_TAB_CLASS   = 'AdminZeyvroTurnstile';
     const ZV_TAB_NAME    = 'Anti SPAM';
     const ZV_TAB_ICON    = 'verified_user';
-    const ZV_ADS_VARIANT = 'free';
-    const ZV_SCHEMA_TABV = 'A';               // cambiar solo si la estructura de tabs cambia
+    const ZV_ADS_VARIANT  = 'free';
+    const ZV_LICENSE_TYPE = 'free';
+    const ZV_SCHEMA_TABV  = 'A';               // cambiar solo si la estructura de tabs cambia
     const ZV_SCHEMA_KEY  = 'ZEYVROTURNSTILE_TABV';
 
     // ── Config keys propios del módulo ────────────────────────────────────
