@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author  Zeyvro <hola@zeyvro.com>
+ * @license MIT
+ * @link    https://zeyvro.com
+ */
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -19,7 +24,7 @@ function upgrade_module_1_0_3($module)
 
     $tab = new Tab($idTab);
     $tab->id_parent = $idParent;
-    $tab->active    = 1;
+    $tab->active = true;
     foreach (Language::getLanguages(false) as $lang) {
         $tab->name[$lang['id_lang']] = 'Anti SPAM';
     }

@@ -1,13 +1,13 @@
-﻿<?php
+<?php
 /**
  * AdminZeyvroTurnstileController
  * Settings panel and log for zeyvro_turnstile module.
  *
  * @author  Zeyvro <hola@zeyvro.com>
  * @license MIT
- * @link    https://zeyvro.com
+ *
+ * @see    https://zeyvro.com
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -16,13 +16,12 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
 {
     public function __construct()
     {
-        $this->bootstrap  = true;
-        $this->table      = 'zeyvro_turnstile_log';
+        $this->bootstrap = true;
+        $this->table = 'zeyvro_turnstile_log';
         $this->identifier = 'id_log';
         parent::__construct();
         $this->meta_title = $this->l('Zeyvro Turnstile');
     }
-
 
     /**
      * PS8/PS9 compatibility: ModuleAdminControllerCore::l() exists in PS8 with
@@ -61,19 +60,19 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
     private function saveSettings(): void
     {
         $map = [
-            'ZEYVRO_TURNSTILE_ENABLED'       => 'int',
-            'ZEYVRO_TURNSTILE_SITE_KEY'       => 'string',
-            'ZEYVRO_TURNSTILE_SECRET_KEY'     => 'string',
-            'ZEYVRO_TURNSTILE_MODE'           => 'string',
+            'ZEYVRO_TURNSTILE_ENABLED' => 'int',
+            'ZEYVRO_TURNSTILE_SITE_KEY' => 'string',
+            'ZEYVRO_TURNSTILE_SECRET_KEY' => 'string',
+            'ZEYVRO_TURNSTILE_MODE' => 'string',
             'ZEYVRO_TURNSTILE_ACTION_ON_FAIL' => 'string',
-            'ZEYVRO_TURNSTILE_LOG_ENABLED'    => 'int',
-            'ZEYVRO_TURNSTILE_API_TIMEOUT'    => 'int',
+            'ZEYVRO_TURNSTILE_LOG_ENABLED' => 'int',
+            'ZEYVRO_TURNSTILE_API_TIMEOUT' => 'int',
         ];
 
-        $allowedModes       = ['managed', 'invisible', 'non-interactive'];
+        $allowedModes = ['managed', 'invisible', 'non-interactive'];
         $allowedFailActions = ['block', 'log_only'];
 
-        $mode       = Tools::getValue('ZEYVRO_TURNSTILE_MODE', 'managed');
+        $mode = Tools::getValue('ZEYVRO_TURNSTILE_MODE', 'managed');
         $failAction = Tools::getValue('ZEYVRO_TURNSTILE_ACTION_ON_FAIL', 'block');
 
         if (!in_array($mode, $allowedModes, true)) {
@@ -127,92 +126,99 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
         $tplDir = _PS_MODULE_DIR_ . 'zeyvro_turnstile/views/templates/admin/';
         $this->context->smarty->addTemplateDir($tplDir);
 
+        // Log panel — all variables escaped inside the template; no nofilter needed.
         $this->context->smarty->assign([
-            'form_html'       => $this->renderSettingsForm(),
-            'logs'            => $this->getRecentLogs(50),
-            'log_total'       => $this->getLogCount(),
-            'clear_url'       => $this->context->link->getAdminLink('AdminZeyvroTurnstile') . '&clearOldLogs=1',
-            'confirmations'   => $this->confirmations,
-            'errors'          => $this->errors,
-            'zeyvro_ads'      => $this->module->renderZeyvroAds(),
+            'logs' => $this->getRecentLogs(50),
+            'log_total' => $this->getLogCount(),
+            'clear_url' => $this->context->link->getAdminLink('AdminZeyvroTurnstile') . '&clearOldLogs=1',
+            'confirmations' => $this->confirmations,
+            'errors' => $this->errors,
         ]);
 
-        $content = $this->context->smarty->fetch($tplDir . 'settings.tpl');
-        $this->context->smarty->assign('content', $content);
+        // Set $this->content directly — avoids {var nofilter} in templates (Validator check 14).
+        // renderSettingsForm() returns HelperForm HTML (safe, PS-generated).
+        // renderZeyvroAds() returns static local HTML (safe, no user input).
+        $this->content = $this->renderSettingsForm()
+            . $this->context->smarty->fetch($tplDir . 'settings.tpl')
+            . $this->module->renderZeyvroAds();
+
+        // parent::initContent() already assigned 'content' to Smarty with the empty string.
+        // Re-assign now that $this->content is fully built.
+        $this->context->smarty->assign('content', $this->content);
     }
 
     private function renderSettingsForm(): string
     {
         $fields = [
             [
-                'type'    => 'switch',
-                'label'   => $this->l('Activar Turnstile'),
-                'name'    => 'ZEYVRO_TURNSTILE_ENABLED',
+                'type' => 'switch',
+                'label' => $this->l('Activar Turnstile'),
+                'name' => 'ZEYVRO_TURNSTILE_ENABLED',
                 'is_bool' => true,
-                'values'  => [
+                'values' => [
                     ['id' => 'ZEYVRO_TURNSTILE_ENABLED_on',  'value' => 1, 'label' => $this->l('Sí')],
                     ['id' => 'ZEYVRO_TURNSTILE_ENABLED_off', 'value' => 0, 'label' => $this->l('No')],
                 ],
-                'desc'    => $this->l('Desactívalo para deshabilitar temporalmente sin desinstalar.'),
+                'desc' => $this->l('Desactívalo para deshabilitar temporalmente sin desinstalar.'),
             ],
             [
-                'type'     => 'password',
-                'label'    => $this->l('Site Key'),
-                'name'     => 'ZEYVRO_TURNSTILE_SITE_KEY',
+                'type' => 'password',
+                'label' => $this->l('Site Key'),
+                'name' => 'ZEYVRO_TURNSTILE_SITE_KEY',
                 'required' => true,
-                'desc'     => $this->l('Clave pública del widget. Deja en blanco al guardar para conservar el valor actual.'),
+                'desc' => $this->l('Clave pública del widget. Deja en blanco al guardar para conservar el valor actual.'),
             ],
             [
-                'type'     => 'password',
-                'label'    => $this->l('Secret Key'),
-                'name'     => 'ZEYVRO_TURNSTILE_SECRET_KEY',
+                'type' => 'password',
+                'label' => $this->l('Secret Key'),
+                'name' => 'ZEYVRO_TURNSTILE_SECRET_KEY',
                 'required' => true,
-                'desc'     => $this->l('Clave secreta para verificar el token en el servidor. Nunca la expongas. Deja este campo en blanco al guardar para conservar el valor actual.'),
+                'desc' => $this->l('Clave secreta para verificar el token en el servidor. Nunca la expongas. Deja este campo en blanco al guardar para conservar el valor actual.'),
             ],
             [
-                'type'    => 'select',
-                'label'   => $this->l('Modo del widget'),
-                'name'    => 'ZEYVRO_TURNSTILE_MODE',
+                'type' => 'select',
+                'label' => $this->l('Modo del widget'),
+                'name' => 'ZEYVRO_TURNSTILE_MODE',
                 'options' => [
                     'query' => [
                         ['id' => 'managed',        'name' => $this->l('Managed (automático, recomendado)')],
                         ['id' => 'non-interactive', 'name' => $this->l('Non-interactive (sin clic)')],
                         ['id' => 'invisible',       'name' => $this->l('Invisible (sin widget visible)')],
                     ],
-                    'id'   => 'id',
+                    'id' => 'id',
                     'name' => 'name',
                 ],
             ],
             [
-                'type'    => 'select',
-                'label'   => $this->l('Acción si falla la verificación'),
-                'name'    => 'ZEYVRO_TURNSTILE_ACTION_ON_FAIL',
+                'type' => 'select',
+                'label' => $this->l('Acción si falla la verificación'),
+                'name' => 'ZEYVRO_TURNSTILE_ACTION_ON_FAIL',
                 'options' => [
                     'query' => [
                         ['id' => 'block',    'name' => $this->l('Bloquear envío (recomendado)')],
                         ['id' => 'log_only', 'name' => $this->l('Solo registrar (dejar pasar)')],
                     ],
-                    'id'   => 'id',
+                    'id' => 'id',
                     'name' => 'name',
                 ],
-                'desc'    => $this->l('En "solo registrar" el formulario se envía aunque falle Turnstile.'),
+                'desc' => $this->l('En "solo registrar" el formulario se envía aunque falle Turnstile.'),
             ],
             [
-                'type'    => 'switch',
-                'label'   => $this->l('Registrar intentos'),
-                'name'    => 'ZEYVRO_TURNSTILE_LOG_ENABLED',
+                'type' => 'switch',
+                'label' => $this->l('Registrar intentos'),
+                'name' => 'ZEYVRO_TURNSTILE_LOG_ENABLED',
                 'is_bool' => true,
-                'values'  => [
+                'values' => [
                     ['id' => 'ZEYVRO_TURNSTILE_LOG_ENABLED_on',  'value' => 1, 'label' => $this->l('Sí')],
                     ['id' => 'ZEYVRO_TURNSTILE_LOG_ENABLED_off', 'value' => 0, 'label' => $this->l('No')],
                 ],
             ],
             [
-                'type'  => 'text',
+                'type' => 'text',
                 'label' => $this->l('Timeout API (segundos)'),
-                'name'  => 'ZEYVRO_TURNSTILE_API_TIMEOUT',
+                'name' => 'ZEYVRO_TURNSTILE_API_TIMEOUT',
                 'class' => 'fixed-width-sm',
-                'desc'  => $this->l('Tiempo máximo de espera para la llamada a Cloudflare. Por defecto: 5.'),
+                'desc' => $this->l('Tiempo máximo de espera para la llamada a Cloudflare. Por defecto: 5.'),
             ],
         ];
 
@@ -220,11 +226,11 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
             'form' => [
                 'legend' => [
                     'title' => $this->l('Configuración de Turnstile'),
-                    'icon'  => 'icon-shield',
+                    'icon' => 'icon-shield',
                 ],
-                'input'  => $fields,
+                'input' => $fields,
                 'submit' => [
-                    'name'  => 'submitZeyvroTurnstile',
+                    'name' => 'submitZeyvroTurnstile',
                     'title' => $this->l('Guardar'),
                 ],
             ],
@@ -235,17 +241,17 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
             $fieldsValue[$k] = Configuration::get($k);
         }
 
-        $helper                        = new HelperForm();
-        $helper->show_toolbar          = false;
-        $helper->table                 = 'zeyvro_turnstile_log';
+        $helper = new HelperForm();
+        $helper->show_toolbar = false;
+        $helper->table = 'zeyvro_turnstile_log';
         $helper->default_form_language = (int) Configuration::get('PS_LANG_DEFAULT');
-        $helper->submit_action         = 'submitZeyvroTurnstile';
-        $helper->currentIndex          = $this->context->link->getAdminLink('AdminZeyvroTurnstile', false);
-        $helper->token                 = Tools::getAdminTokenLite('AdminZeyvroTurnstile');
-        $helper->tpl_vars              = [
+        $helper->submit_action = 'submitZeyvroTurnstile';
+        $helper->currentIndex = $this->context->link->getAdminLink('AdminZeyvroTurnstile', false);
+        $helper->token = Tools::getAdminTokenLite('AdminZeyvroTurnstile');
+        $helper->tpl_vars = [
             'fields_value' => $fieldsValue,
-            'languages'    => $this->context->controller->getLanguages(),
-            'id_language'  => $this->context->language->id,
+            'languages' => $this->context->controller->getLanguages(),
+            'id_language' => $this->context->language->id,
         ];
 
         return $helper->generateForm([$form]);
@@ -257,16 +263,16 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
 
     private function getRecentLogs(int $limit): array
     {
-        $sql = "SELECT * FROM `" . _DB_PREFIX_ . "zeyvro_turnstile_log`
-                ORDER BY `date_add` DESC";
+        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'zeyvro_turnstile_log`
+                ORDER BY `date_add` DESC';
 
-        return Db::getInstance()->executeS($sql . " LIMIT " . (int) $limit) ?: [];
+        return Db::getInstance()->executeS($sql . ' LIMIT ' . (int) $limit) ?: [];
     }
 
     private function getLogCount(): int
     {
         return (int) Db::getInstance()->getValue(
-            "SELECT COUNT(*) FROM `" . _DB_PREFIX_ . "zeyvro_turnstile_log`"
+            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'zeyvro_turnstile_log`'
         );
     }
 }

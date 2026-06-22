@@ -9,7 +9,6 @@
  * @author  Zeyvro <hola@zeyvro.com>
  * @license MIT
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -18,12 +17,14 @@ function upgrade_module_1_0_10($module)
 {
     try {
         $module->clearAllCaches();
+
         return true;
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         PrestaShopLogger::addLog(
             'zeyvro_turnstile upgrade-1.0.10 error: ' . $e->getMessage(),
             3, null, 'zeyvro_turnstile', 0, true
         );
+
         return true;
     }
 }

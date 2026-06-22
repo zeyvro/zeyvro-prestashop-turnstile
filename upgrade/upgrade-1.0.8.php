@@ -1,5 +1,10 @@
 <?php
 /**
+ * @author  Zeyvro <hola@zeyvro.com>
+ * @license MIT
+ * @link    https://zeyvro.com
+ */
+/**
  * Upgrade 1.0.8 — Adopta ZeyvroModuleTrait como base común.
  *
  * Cambios: elimina lógica de tab/caché ad-hoc; pasa a usar ensureTabs()
@@ -9,7 +14,6 @@
  *
  * Idempotente: correr 2× no duplica ni rompe nada.
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -30,11 +34,12 @@ function upgrade_module_1_0_8($module)
         $module->clearAllCaches();
 
         return true;
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         PrestaShopLogger::addLog(
             'zeyvro_turnstile upgrade-1.0.8 error: ' . $e->getMessage(),
             3, null, 'zeyvro_turnstile', 0, true
         );
+
         return true; // nunca WSOD — el botón "Actualizar" nativo queda como fallback
     }
 }

@@ -7,15 +7,25 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ## 1.0.10 — 2026-06-22
 
-### Fixed
+### Fixed (Fase 3 — PS9 compat)
 - **PS9 BLOCKER**: `ModuleAdminControllerCore::l()` fue eliminado en PS9 — añadido wrapper `l()` PS9-safe en `AdminZeyvroTurnstileController` con la firma compatible con PS8 (`$string, $class, $addslashes, $htmlentities`). Sin este fix el panel lanzaba `UndefinedMethodError` → HTTP 500 en PS9.
 - **PS9 BLOCKER**: `ps_versions_compliancy max` era `_PS_VERSION_` → corregido a `'9.99.99'`. Con `_PS_VERSION_` el módulo bloqueaba instalación en PS9 con mensaje "This module is not compatible with your version of PrestaShop".
 - `config.xml` `max` actualizado a `9.99.99`.
 
-### Changed
+### Fixed (Fase 4 — Verified+)
+- **Seguridad**: eliminados `{chr(36)}form_html nofilter}` y `{chr(36)}zeyvro_ads nofilter}` de `settings.tpl`. El form se renderiza via `$this->content` directamente (patrón gold template). Las ads se concatenan en PHP, sin inyección de HTML raw en Smarty. Validator check 14: 0 nofilter.
+- **Compatibilidad**: `->active = 1` → `->active = true` en `ZeyvroModuleTrait.php`, `upgrade-1.0.3.php`, `upgrade-1.0.7.php`.
+- **Compatibilidad**: return types añadidos en los 3 métodos hook (`hookDisplayHeader`, `hookDisplayBeforeBodyClosingTag`, `hookActionFrontControllerSetMedia`).
+- **Licencias .tpl**: cabecera `@license MIT` (comentario Smarty `{* *}`) añadida a `settings.tpl` y `turnstile_widget.tpl`. EOL LF.
+
+### Added (Fase 4 — Verified+)
+- `.php-cs-fixer.dist.php`: ruleset PS oficial con las 3 barreras irreducibles documentadas.
+- `phpstan.neon` paths: `classes/` incluida; `clearSf2Cache` añadido a stubs. PHPStan 0 errores.
+
+### Changed (Fase 3)
 - `composer.json` `license`: `proprietary` → `MIT` (coherente con módulo free).
 
-### Removed
+### Removed (Fase 3)
 - `config_es.xml` eliminado (0 referencias en código; solo causaba warnings en el Validator).
 
 ---

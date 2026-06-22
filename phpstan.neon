@@ -17,6 +17,7 @@ parameters:
 
     paths:
         - zeyvro_turnstile.php
+        - classes
         - controllers
 
     excludePaths:

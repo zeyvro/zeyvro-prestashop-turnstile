@@ -1,5 +1,9 @@
-{**
+{*
  * Panel de administración — Turnstile Anti-Spam
+ *
+ * @author  Zeyvro <hola@zeyvro.com>
+ * @license MIT
+ * @link    https://zeyvro.com
  *}
 
 {if $confirmations}
@@ -13,8 +17,6 @@
     <div class="alert alert-danger">{$error|escape:'htmlall':'UTF-8'}</div>
   {/foreach}
 {/if}
-
-{$form_html nofilter}
 
 <div class="panel">
   <div class="panel-heading">
@@ -78,4 +80,3 @@
   </div>
 </div>
 
-{$zeyvro_ads nofilter}

@@ -1,5 +1,10 @@
 <?php
 /**
+ * @author  Zeyvro <hola@zeyvro.com>
+ * @license MIT
+ * @link    https://zeyvro.com
+ */
+/**
  * Upgrade 1.0.7 — Repara la jerarquía de tabs al patrón canónico AdminZeyvroParent.
  *
  * Problema en 1.0.6: el tab se creó bajo AdminParentLocalization (Internacional) y/o
@@ -7,7 +12,6 @@
  *
  * Este script es IDEMPOTENTE: correrlo dos veces no duplica nada.
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -27,6 +31,7 @@ function upgrade_module_1_0_7($module)
                 'zeyvro_turnstile upgrade-1.0.7: no se encontro IMPROVE ni AdminParentModulesSf',
                 3
             );
+
             return false;
         }
 
@@ -41,7 +46,7 @@ function upgrade_module_1_0_7($module)
         if (empty($parents)) {
             // No existe: crear
             $parent = new Tab();
-            $parent->active = 1;
+            $parent->active = true;
             $parent->class_name = 'AdminZeyvroParent';
             $parent->name = [];
             foreach (Language::getLanguages(true) as $lang) {
@@ -55,6 +60,7 @@ function upgrade_module_1_0_7($module)
                     'zeyvro_turnstile upgrade-1.0.7: fallo al crear AdminZeyvroParent',
                     3
                 );
+
                 return false;
             }
             $id_zeyvro_parent = (int) $parent->id;
@@ -101,7 +107,7 @@ function upgrade_module_1_0_7($module)
             $tab = new Tab($id_child);
             $tab->id_parent = $id_zeyvro_parent;
             $tab->module = $module->name;
-            $tab->active = 1;
+            $tab->active = true;
             $tab->icon = 'verified_user';
             foreach (Language::getLanguages(true) as $lang) {
                 $tab->name[$lang['id_lang']] = 'Anti SPAM';
@@ -110,7 +116,7 @@ function upgrade_module_1_0_7($module)
         } else {
             // No existe: crear
             $tab = new Tab();
-            $tab->active = 1;
+            $tab->active = true;
             $tab->class_name = 'AdminZeyvroTurnstile';
             $tab->name = [];
             foreach (Language::getLanguages(true) as $lang) {
@@ -129,11 +135,12 @@ function upgrade_module_1_0_7($module)
         }
 
         return true;
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         PrestaShopLogger::addLog(
             'zeyvro_turnstile upgrade-1.0.7 error: ' . $e->getMessage(),
             3, null, 'zeyvro_turnstile', 0, true
         );
+
         return true; // nunca WSOD — el boton Actualizar nativo queda como fallback
     }
 }
