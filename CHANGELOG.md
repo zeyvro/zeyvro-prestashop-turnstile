@@ -5,6 +5,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ---
 
+## 1.0.9 — 2026-06-22
+
+### Changed
+- **Licencia composer**: `"license": "proprietary"` → `"license": "MIT"` (alineado con `ZV_LICENSE_TYPE='free'` y el fichero LICENSE MIT). Sin cambio funcional.
+- **Cabeceras @license MIT**: añadidas a los `.php` del módulo que las tenían ausentes (`index.php` stubs × 3, upgrade scripts × 6, controller y translations × 2).
+
+---
+
 ## 1.0.8 — 2026-06-15
 
 ### Added

@@ -81,7 +81,7 @@ trait ZeyvroModuleTrait
         if (empty($rows)) {
             // Crear parent
             $parent             = new Tab();
-            $parent->active     = 1;
+            $parent->active     = true;
             $parent->class_name = 'AdminZeyvroParent';
             $parent->module     = '';   // compartido — NUNCA el nombre de un módulo concreto
             $parent->id_parent  = $id_improve;
@@ -132,7 +132,7 @@ trait ZeyvroModuleTrait
             $tab            = new Tab($id_child);
             $tab->id_parent = $id_parent;
             $tab->module    = $this->name;
-            $tab->active    = 1;
+            $tab->active    = true;
             $tab->icon      = static::ZV_TAB_ICON;
             $tab->name      = [];
             foreach (Language::getLanguages(true) as $lang) {
@@ -141,7 +141,7 @@ trait ZeyvroModuleTrait
             $tab->save();
         } else {
             $tab             = new Tab();
-            $tab->active     = 1;
+            $tab->active     = true;
             $tab->class_name = static::ZV_TAB_CLASS;
             $tab->module     = $this->name;
             $tab->id_parent  = $id_parent;

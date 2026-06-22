@@ -42,7 +42,7 @@ class Zeyvro_Turnstile extends Module
     {
         $this->name          = 'zeyvro_turnstile';
         $this->tab           = 'other';
-        $this->version       = '1.0.8';
+        $this->version       = '1.0.9';
         $this->author        = 'Zeyvro';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => _PS_VERSION_];

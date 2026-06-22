@@ -6,6 +6,7 @@
  * se usó AdminZeyvroGroup como parent en lugar de AdminZeyvroParent.
  *
  * Este script es IDEMPOTENTE: correrlo dos veces no duplica nada.
+ * @license   MIT
  */
 
 if (!defined('_PS_VERSION_')) {
@@ -41,7 +42,7 @@ function upgrade_module_1_0_7($module)
         if (empty($parents)) {
             // No existe: crear
             $parent = new Tab();
-            $parent->active = 1;
+            $parent->active = true;
             $parent->class_name = 'AdminZeyvroParent';
             $parent->name = [];
             foreach (Language::getLanguages(true) as $lang) {
@@ -101,7 +102,7 @@ function upgrade_module_1_0_7($module)
             $tab = new Tab($id_child);
             $tab->id_parent = $id_zeyvro_parent;
             $tab->module = $module->name;
-            $tab->active = 1;
+            $tab->active = true;
             $tab->icon = 'verified_user';
             foreach (Language::getLanguages(true) as $lang) {
                 $tab->name[$lang['id_lang']] = 'Anti SPAM';
@@ -110,7 +111,7 @@ function upgrade_module_1_0_7($module)
         } else {
             // No existe: crear
             $tab = new Tab();
-            $tab->active = 1;
+            $tab->active = true;
             $tab->class_name = 'AdminZeyvroTurnstile';
             $tab->name = [];
             foreach (Language::getLanguages(true) as $lang) {

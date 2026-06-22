@@ -1,7 +1,8 @@
-﻿<?php
+<?php
 /**
  * AdminZeyvroTurnstileController
  * Settings panel and log for zeyvro_turnstile module.
+ * @license   MIT
  */
 
 if (!defined('_PS_VERSION_')) {

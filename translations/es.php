@@ -2,6 +2,7 @@
 /**
  * zeyvro_turnstile — Traducciones al español
  * Generado: 2026-06-15
+ * @license   MIT
  */
 
 global $_MODULE;

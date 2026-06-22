@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Zeyvro
+ * @copyright 2026 Zeyvro
+ * @license   MIT
+ */
 if (!defined('_PS_VERSION_')) {
     exit;
 }

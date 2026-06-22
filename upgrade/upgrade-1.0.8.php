@@ -8,6 +8,7 @@
  * Uninstall pasa a ser preservativo (conserva tabla de logs y configuración).
  *
  * Idempotente: correr 2× no duplica ni rompe nada.
+ * @license   MIT
  */
 
 if (!defined('_PS_VERSION_')) {
