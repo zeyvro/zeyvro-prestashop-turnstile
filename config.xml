@@ -2,7 +2,7 @@
 <module>
     <name>zeyvro_turnstile</name>
     <displayName><![CDATA[Turnstile Anti-Spam]]></displayName>
-    <version><![CDATA[1.0.8]]></version>
+    <version><![CDATA[1.0.10]]></version>
     <description><![CDATA[Anti-spam protection with Cloudflare Turnstile on the PrestaShop contact form.]]></description>
     <author><![CDATA[Zeyvro]]></author>
     <tab><![CDATA[other]]></tab>
@@ -11,6 +11,6 @@
     <limited_countries></limited_countries>
     <ps_versions_compliancy>
         <min>8.0.0</min>
-        <max>8.99.99</max>
+        <max>9.99.99</max>
     </ps_versions_compliancy>
 </module>
