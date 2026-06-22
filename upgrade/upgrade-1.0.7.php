@@ -2,7 +2,8 @@
 /**
  * @author  Zeyvro <hola@zeyvro.com>
  * @license MIT
- * @link    https://zeyvro.com
+ *
+ * @see    https://zeyvro.com
  */
 /**
  * Upgrade 1.0.7 — Repara la jerarquía de tabs al patrón canónico AdminZeyvroParent.
@@ -16,7 +17,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_1_0_7($module)
+function upgrade_module_1_0_7(Module $module): bool
 {
     try {
         $db = Db::getInstance();

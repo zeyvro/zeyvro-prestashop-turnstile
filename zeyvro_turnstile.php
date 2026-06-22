@@ -12,7 +12,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once dirname(__FILE__) . '/classes/ZeyvroModuleTrait.php';
+require_once __DIR__ . '/classes/ZeyvroModuleTrait.php';
 
 class Zeyvro_Turnstile extends Module
 {
@@ -300,7 +300,7 @@ class Zeyvro_Turnstile extends Module
             if (!$installed || !preg_match('/^\d+\.\d+\.\d+$/', $installed)) {
                 return;
             }
-            $xmlPath = dirname(__FILE__) . '/config.xml';
+            $xmlPath = __DIR__ . '/config.xml';
             if (!file_exists($xmlPath)) {
                 return;
             }
@@ -316,7 +316,7 @@ class Zeyvro_Turnstile extends Module
                 return;
             }
             define('ZEYVROTURNSTILE_UPGRADING', true);
-            $scripts = glob(dirname(__FILE__) . '/upgrade/upgrade-*.php');
+            $scripts = glob(__DIR__ . '/upgrade/upgrade-*.php');
             if ($scripts) {
                 usort($scripts, function ($a, $b) {
                     $va = preg_replace('/.*upgrade-(.+)\.php$/', '$1', $a);

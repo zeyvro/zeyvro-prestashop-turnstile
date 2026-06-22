@@ -2,13 +2,14 @@
 /**
  * @author  Zeyvro <hola@zeyvro.com>
  * @license MIT
- * @link    https://zeyvro.com
+ *
+ * @see    https://zeyvro.com
  */
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_1_0_2($module)
+function upgrade_module_1_0_2(Module $module): bool
 {
     return true;
 }

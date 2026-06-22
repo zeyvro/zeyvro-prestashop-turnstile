@@ -2,7 +2,8 @@
 /**
  * @author  Zeyvro <hola@zeyvro.com>
  * @license MIT
- * @link    https://zeyvro.com
+ *
+ * @see    https://zeyvro.com
  */
 /**
  * Upgrade 1.0.8 — Adopta ZeyvroModuleTrait como base común.
@@ -18,7 +19,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_1_0_8($module)
+function upgrade_module_1_0_8(Module $module): bool
 {
     try {
         // 1. Normalizar tabs con el nuevo ensureTabs() idempotente del trait

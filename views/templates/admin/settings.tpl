@@ -22,7 +22,7 @@
   <div class="panel-heading">
     <i class="icon-list"></i>
     {l s='Log de verificaciones (últimas 50)' mod='zeyvro_turnstile'}
-    <span class="badge">{$log_total}</span>
+    <span class="badge">{$log_total|escape:'htmlall':'UTF-8'}</span>
   </div>
 
   <div class="panel-body">
@@ -75,7 +75,7 @@
       {l s='Limpiar logs >30 días' mod='zeyvro_turnstile'}
     </a>
     <small class="text-muted" style="margin-left:10px;">
-      {l s='Total en BD: ' mod='zeyvro_turnstile'}{$log_total}
+      {l s='Total en BD: ' mod='zeyvro_turnstile'}{$log_total|escape:'htmlall':'UTF-8'}
     </small>
   </div>
 </div>
