@@ -2,7 +2,7 @@
     "name": "zeyvro/zeyvroturnstile",
     "description": "Zeyvro_Turnstile - Cloudflare Turnstile CAPTCHA para PrestaShop",
     "type": "prestashop-module",
-    "license": "proprietary",
+    "license": "MIT",
     "require": {
         "php": ">=8.1"
     },
@@ -11,6 +11,7 @@
         "prestashop/phpstan-prestashop": "2.0"
     },
     "config": {
+        "prepend-autoloader": false,
         "allow-plugins": {
             "phpstan/extension-installer": true
         }

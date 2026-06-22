@@ -5,6 +5,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ---
 
+## 1.0.10 — 2026-06-22
+
+### Fixed
+- **PS9 BLOCKER**: `ModuleAdminControllerCore::l()` fue eliminado en PS9 — añadido wrapper `l()` PS9-safe en `AdminZeyvroTurnstileController` con la firma compatible con PS8 (`$string, $class, $addslashes, $htmlentities`). Sin este fix el panel lanzaba `UndefinedMethodError` → HTTP 500 en PS9.
+- **PS9 BLOCKER**: `ps_versions_compliancy max` era `_PS_VERSION_` → corregido a `'9.99.99'`. Con `_PS_VERSION_` el módulo bloqueaba instalación en PS9 con mensaje "This module is not compatible with your version of PrestaShop".
+- `config.xml` `max` actualizado a `9.99.99`.
+
+### Changed
+- `composer.json` `license`: `proprietary` → `MIT` (coherente con módulo free).
+
+### Removed
+- `config_es.xml` eliminado (0 referencias en código; solo causaba warnings en el Validator).
+
+---
+
 ## 1.0.8 — 2026-06-15
 
 ### Added

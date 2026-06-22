@@ -2,6 +2,10 @@
 /**
  * AdminZeyvroTurnstileController
  * Settings panel and log for zeyvro_turnstile module.
+ *
+ * @author  Zeyvro <hola@zeyvro.com>
+ * @license MIT
+ * @link    https://zeyvro.com
  */
 
 if (!defined('_PS_VERSION_')) {
@@ -19,6 +23,24 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
         $this->meta_title = $this->l('Zeyvro Turnstile');
     }
 
+
+    /**
+     * PS8/PS9 compatibility: ModuleAdminControllerCore::l() exists in PS8 with
+     * signature ($string, $class, $addslashes, $htmlentities); PS9 removed it.
+     * Signature must match the PS8 parent to avoid Compile Error on PS8.
+     * Delegates to Module::l() which handles i18n uniformly on both versions.
+     *
+     * @param string $string
+     * @param string|null $class
+     * @param bool $addslashes
+     * @param bool $htmlentities
+     *
+     * @return string
+     */
+    public function l($string, $class = null, $addslashes = false, $htmlentities = true): string
+    {
+        return $this->module->l($string);
+    }
     /* =====================================================================
      * POST PROCESSING (form save + clear logs)
      * =================================================================== */
