@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Zeyvro - Cloudflare Turnstile for PrestaShop
  *

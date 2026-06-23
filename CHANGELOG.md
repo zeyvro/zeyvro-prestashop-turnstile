@@ -5,6 +5,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ---
 
+## 1.1.3 — 2026-06-23
+
+### Fixed (Validator PS — Licenses)
+- **LICENSES**: revertida la regla `blank_line_after_opening_tag` a `false`. Habilitarla en v1.1.2 rompió Licenses 0→23 (módulo 3740522): el Validator PS exige "There must be no blank lines before the file comment" (la cabecera `/** licencia */` debe ir pegada a `<?php`). La blank line introducida por v1.1.2 se elimina de los 23 ficheros PHP del módulo.
+- `phpdoc_to_comment => true` se mantiene (no afecta Licenses; solo convierte `/**` secundarios no estructurales a `/*`).
+- **Standards residuales por `blank_line_after_opening_tag` son IRREDUCIBLES**: contradicción interna del Validator (exige la blank line en Standards pero la prohíbe en Licenses). Documentado en `.php-cs-fixer.dist.php`.
+
+### Added
+- `upgrade/upgrade-1.1.3.php`: script de upgrade idempotente (limpieza de caché).
+
+### Changed
+- Gold template (zeyvro_template / feature/ps9-scaffold-fixes): `.php-cs-fixer.dist.php` propagado con `blank_line_after_opening_tag => false` y la misma barrera documentada.
+
+---
+
 ## 1.1.2 — 2026-06-23
 
 ### Fixed (Validator PS — Standards)

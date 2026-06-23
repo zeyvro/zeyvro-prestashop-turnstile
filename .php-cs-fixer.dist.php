@@ -39,24 +39,25 @@ return (new Config())
         'yoda_style' => false,
         'non_printable_character' => true,
         'no_superfluous_phpdoc_tags' => false,
-        // ── Reglas habilitadas tras verificación con Validator real (v1.1.2) ──────
-        //
-        // blank_line_after_opening_tag: añade blank line tras <?php en todos los
-        // ficheros. PHP CS Fixer 3.x trata el primer /** del fichero como file-header
-        // y NO lo desplaza; el check Licenses sigue en 0.
-        // Validator PS requiere esta regla: Standards=4 sin ella.
-        'blank_line_after_opening_tag' => true,
-        //
         // phpdoc_to_comment: convierte /** no-estructurales a /* ordinario.
-        // PHP CS Fixer 3.x preserva el primer /** (file-header) como /** — los
-        // index.php de seguridad y los headers de licencia quedan intactos.
-        // Solo convierte /** secundarios (ej. comentarios de descripción en upgrade/).
+        // PHP CS Fixer 3.x preserva el primer /** (file-header/licencia) de cada
+        // fichero; solo convierte /** secundarios no estructurales (ej. descripción
+        // en upgrade/). Licenses sigue en 0. Validado Validator real 2026-06-23.
         'phpdoc_to_comment' => true,
         //
-        // ── BARRERA IRREDUCIBLE — NO habilitar: ─────────────────────────────────
-        // no_alternative_syntax: convertiría if/endif a {}. El parser estático del
-        // Validator PS detecta `trait X {}` solo dentro de if(...):...endif; en
-        // ZeyvroModuleTrait.php. Rompe el check Requirements. Ver REGLAS-DURAS §trampas.
+        // ── BARRERAS IRREDUCIBLES — contradicciones del propio Validator PS ──────
+        //
+        // blank_line_after_opening_tag=false OBLIGATORIO.
+        // El Validator exige "There must be no blank lines before the file comment"
+        // (cabecera /** licencia */ pegada a <?php). Habilitar esta regla rompió
+        // Licenses 0→23 en turnstile 3740522 (2026-06-23). Standards residuales
+        // por blank_line son IRREDUCIBLES — contradicción interna del Validator.
+        'blank_line_after_opening_tag' => false,
+        //
+        // no_alternative_syntax=false OBLIGATORIO.
+        // Convertiría if/endif a {}. El parser estático del Validator PS detecta
+        // `trait X {}` solo dentro de if(...):...endif; en ZeyvroModuleTrait.php.
+        // Habilitarla rompe Requirements. Ver REGLAS-DURAS §trampas.
         'no_alternative_syntax' => false,
     ])
     ->setFinder($finder);
