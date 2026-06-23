@@ -5,6 +5,20 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ---
 
+## 1.1.1 — 2026-06-23
+
+### Fixed (Validator PS — Requirements + Compatibility + Optimizations + Standards)
+- **REQUIREMENTS**: `$this->tab` cambiado de `'other'` (valor inválido) a `'front_office_features'`. Mismo valor en `config.xml <tab>`.
+- **COMPATIBILITY**: eliminada la funcionalidad "Zeyvro Ads" (`renderZeyvroAds()` del trait y la llamada en `AdminZeyvroTurnstileController`). Motivo: Addons PS no permite promocionar productos/enlaces fuera de Addons.
+- **COMPATIBILITY**: reemplazadas todas las llamadas `$module->clearAllCaches()` y `$module->ensureTabs()` en scripts de upgrade (`1.0.6`, `1.0.7`, `1.0.8`, `1.0.10`, `1.1.0`) por llamadas directas a las funciones estándar de PS (`Tools::clearSmartyCache()`, `Media::clearCache()`, `opcache_reset()`). El Validator no resuelve métodos de trait sobre el tipo `Module` en parámetros de funciones.
+- **OPTIMIZATIONS**: `hookDisplayHeader` ya no retorna HTML inline con `<script src="...">`. Registra el JS de Turnstile vía `registerJavascript()` (server remote, position head, async defer).
+- **STANDARDS**: php-cs-fixer 0 archivos pendientes. Barreras irreducibles documentadas en `.php-cs-fixer.dist.php` (no_alternative_syntax del guard trait, blank_line_after_opening_tag).
+
+### Added
+- `upgrade/upgrade-1.1.1.php`: script de upgrade idempotente (limpieza de caché directa).
+
+---
+
 ## 1.1.0 — 2026-06-23
 
 ### Changed (Validator PS — esqueleto canónico)

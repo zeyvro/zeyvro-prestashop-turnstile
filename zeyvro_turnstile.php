@@ -46,8 +46,8 @@ class Zeyvro_Turnstile extends Module
     public function __construct()
     {
         $this->name = 'zeyvro_turnstile';
-        $this->tab = 'other';
-        $this->version = '1.1.0';
+        $this->tab = 'front_office_features';
+        $this->version = '1.1.1';
         $this->author = 'Zeyvro';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => '9.99.99'];
@@ -157,7 +157,13 @@ class Zeyvro_Turnstile extends Module
             return '';
         }
 
-        return '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>';
+        $this->context->controller->registerJavascript(
+            'turnstile-api',
+            'https://challenges.cloudflare.com/turnstile/v0/api.js',
+            ['server' => 'remote', 'position' => 'head', 'priority' => 150, 'attributes' => 'async defer']
+        );
+
+        return '';
     }
 
     /**

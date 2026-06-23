@@ -30,17 +30,19 @@ if (!defined('_PS_VERSION_')) {
 function upgrade_module_1_0_8(Module $module): bool
 {
     try {
-        // 1. Normalizar tabs con el nuevo ensureTabs() idempotente del trait
-        $module->ensureTabs();
-
-        // 2. Registrar hook de auto-reparación si aún no está registrado
+        // 1. Registrar hook de auto-reparación si aún no está registrado
         $module->registerHook('actionAdminControllerSetMedia');
 
-        // 3. Marcar schema de tabs como actual para que el hook no reejecuté innecesariamente
+        // 2. Marcar schema de tabs como actual para que el hook no reejecuté innecesariamente
+        // (ensureTabs() se ejecuta en el siguiente hook BO si el schema no coincide)
         Configuration::updateValue('ZEYVROTURNSTILE_TABV', 'A');
 
-        // 4. Limpiar cachés
-        $module->clearAllCaches();
+        // 3. Limpiar cachés
+        if (function_exists('opcache_reset')) {
+            @opcache_reset();
+        }
+        @Tools::clearSmartyCache();
+        @Media::clearCache();
 
         return true;
     } catch (Exception $e) {

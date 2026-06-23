@@ -18,7 +18,11 @@ if (!defined('_PS_VERSION_')) {
 }
 function upgrade_module_1_0_6(Module $module): bool
 {
-    $module->clearAllCaches();
+    if (function_exists('opcache_reset')) {
+        @opcache_reset();
+    }
+    @Tools::clearSmartyCache();
+    @Media::clearCache();
 
     return true;
 }

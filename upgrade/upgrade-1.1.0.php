@@ -20,8 +20,12 @@ if (!defined('_PS_VERSION_')) {
 function upgrade_module_1_1_0(Module $module): bool
 {
     try {
-        $module->ensureTabs();
-        $module->clearAllCaches();
+        // ensureTabs() se ejecuta en el siguiente hook BO vía auto-reparación
+        if (function_exists('opcache_reset')) {
+            @opcache_reset();
+        }
+        @Tools::clearSmartyCache();
+        @Media::clearCache();
 
         return true;
     } catch (Exception $e) {

@@ -142,10 +142,8 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
 
         // Set $this->content directly — avoids {var nofilter} in templates (Validator check 14).
         // renderSettingsForm() returns HelperForm HTML (safe, PS-generated).
-        // renderZeyvroAds() returns static local HTML (safe, no user input).
         $this->content = $this->renderSettingsForm()
-            . $this->context->smarty->fetch($tplDir . 'settings.tpl')
-            . $this->module->renderZeyvroAds();
+            . $this->context->smarty->fetch($tplDir . 'settings.tpl');
 
         // parent::initContent() already assigned 'content' to Smarty with the empty string.
         // Re-assign now that $this->content is fully built.

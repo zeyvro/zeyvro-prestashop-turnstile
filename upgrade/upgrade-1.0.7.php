@@ -139,9 +139,11 @@ function upgrade_module_1_0_7(Module $module): bool
         _upgrade107CreateTabRoles('AdminZeyvroTurnstile', $db);
 
         // -- 5. Cache
-        if (method_exists($module, 'clearAllCaches')) {
-            $module->clearAllCaches();
+        if (function_exists('opcache_reset')) {
+            @opcache_reset();
         }
+        @Tools::clearSmartyCache();
+        @Media::clearCache();
 
         return true;
     } catch (Exception $e) {
