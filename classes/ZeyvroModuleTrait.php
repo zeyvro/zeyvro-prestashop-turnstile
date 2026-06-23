@@ -1,23 +1,17 @@
 <?php
 /**
- * ZeyvroModuleTrait — Base común compartida por todos los módulos Zeyvro.
+ * Zeyvro - Cloudflare Turnstile for PrestaShop
  *
- * FUENTE ÚNICA: modulos-prestashop/_shared/ZeyvroModuleTrait.php
- * Se copia VERBATIM en classes/ZeyvroModuleTrait.php de cada módulo.
- * Nunca se modifica por módulo — los cambios van en la fuente y se propagan.
+ * NOTICE OF LICENSE
  *
- * Constantes que el módulo DEBE declarar (como `const` de clase):
- *   ZV_TAB_CLASS   — class_name del tab hijo  (ej. 'AdminZeyvroTurnstile')
- *   ZV_TAB_NAME    — nombre visible en el menú (ej. 'Anti SPAM')
- *   ZV_TAB_ICON    — icono Material Design     (ej. 'verified_user')
- *   ZV_ADS_VARIANT — 'free' | 'paid'
- *   ZV_SCHEMA_TABV — versión del schema de tabs (ej. 'A'); cambiar solo si la
- *                    estructura de tabs cambia para forzar re-reparación.
- *   ZV_SCHEMA_KEY  — config key del flag de auto-reparación
- *                    (ej. 'ZEYVROTURNSTILE_TABV')
+ * This source file is subject to the MIT License
+ * that is bundled with this package in the file LICENSE.md.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/MIT
  *
- * @author  Zeyvro
- * @license MIT
+ * @author    Zeyvro <admin@zeyvro.com>
+ * @copyright 2026 Zeyvro
+ * @license   https://opensource.org/licenses/MIT  MIT License
  */
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -88,7 +82,7 @@ if (!trait_exists('ZeyvroModuleTrait', false)) :
                 $parent->id_parent = $id_improve;
                 $parent->icon = 'tune';
                 $parent->name = [];
-                foreach (Language::getLanguages(true) as $lang) {
+                foreach ((Language::getLanguages(true) ?: []) as $lang) {
                     $parent->name[$lang['id_lang']] = 'Zeyvro';
                 }
                 if (!$parent->add()) {
@@ -137,7 +131,7 @@ if (!trait_exists('ZeyvroModuleTrait', false)) :
                 $tab->active = true;
                 $tab->icon = static::ZV_TAB_ICON;
                 $tab->name = [];
-                foreach (Language::getLanguages(true) as $lang) {
+                foreach ((Language::getLanguages(true) ?: []) as $lang) {
                     $tab->name[$lang['id_lang']] = static::ZV_TAB_NAME;
                 }
                 $tab->save();
@@ -149,7 +143,7 @@ if (!trait_exists('ZeyvroModuleTrait', false)) :
                 $tab->id_parent = $id_parent;
                 $tab->icon = static::ZV_TAB_ICON;
                 $tab->name = [];
-                foreach (Language::getLanguages(true) as $lang) {
+                foreach ((Language::getLanguages(true) ?: []) as $lang) {
                     $tab->name[$lang['id_lang']] = static::ZV_TAB_NAME;
                 }
                 $tab->add();
@@ -302,10 +296,10 @@ if (!trait_exists('ZeyvroModuleTrait', false)) :
                 . 'background:#fafaff;border-radius:0 0 4px 4px;font-family:sans-serif;">'
                 . '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'
                 . '<strong style="font-size:18px;color:#6C63FF;">Zeyvro</strong>'
-                . '<span style="color:#666;font-size:12px;">· Módulos premium para PrestaShop 8</span>'
+                . '<span style="color:#666;font-size:12px;">· Premium modules for PrestaShop 8</span>'
                 . '</div>'
                 . '<p style="color:#555;font-size:13px;margin:0 0 6px;">'
-                . 'Código limpio · Sin suscripciones · Soporte real.'
+                . 'Clean code · No subscriptions · Real support.'
                 . '</p>'
                 . '<a href="https://zeyvro.com?utm_source=module&amp;utm_medium=bo&amp;utm_campaign='
                 . htmlspecialchars($mod, ENT_QUOTES)
@@ -320,26 +314,26 @@ if (!trait_exists('ZeyvroModuleTrait', false)) :
             $cards = [
                 [
                     'name' => 'SEO Redirect 301',
-                    'desc' => 'Redirecciones manuales y auto-detect al cambiar slugs. Nunca pierdas posicionamiento.',
+                    'desc' => 'Manual redirects and auto-detect when changing slugs. Never lose rankings.',
                     'price' => '29 €',
                     'slug' => 'seo-redirect-301',
                 ],
                 [
                     'name' => 'Smart Search Pro',
-                    'desc' => 'Búsqueda instantánea mientras escribes. Sin dependencias externas.',
+                    'desc' => 'Instant search as you type. No external dependencies.',
                     'price' => '39 €',
                     'slug' => 'smart-search-pro',
                 ],
                 [
                     'name' => 'FAQ Accordion',
-                    'desc' => 'FAQs con datos estructurados JSON-LD listos para Google.',
+                    'desc' => 'FAQs with JSON-LD structured data ready for Google.',
                     'price' => '19 €',
                     'slug' => 'faq-accordion',
                 ],
                 [
-                    'name' => '¿Módulo a medida?',
-                    'desc' => 'Desarrollamos lo que necesitas. Presupuesto sin compromiso.',
-                    'price' => 'Consultar',
+                    'name' => 'Custom module?',
+                    'desc' => 'We build what you need. No-commitment quote.',
+                    'price' => 'Contact us',
                     'slug' => 'contacto',
                 ],
             ];

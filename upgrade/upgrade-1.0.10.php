@@ -1,13 +1,17 @@
 <?php
 /**
- * Upgrade 1.0.10 — Compatibilidad PS9.
+ * Zeyvro - Cloudflare Turnstile for PrestaShop
  *
- * Cambios: ps_versions_compliancy max fijado a '9.99.99'.
- * Wrapper l() PS9-safe añadido al AdminController.
- * Idempotente: correr 2× no duplica ni rompe nada.
+ * NOTICE OF LICENSE
  *
- * @author  Zeyvro <hola@zeyvro.com>
- * @license MIT
+ * This source file is subject to the MIT License
+ * that is bundled with this package in the file LICENSE.md.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/MIT
+ *
+ * @author    Zeyvro <admin@zeyvro.com>
+ * @copyright 2026 Zeyvro
+ * @license   https://opensource.org/licenses/MIT  MIT License
  */
 if (!defined('_PS_VERSION_')) {
     exit;

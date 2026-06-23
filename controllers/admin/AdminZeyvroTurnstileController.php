@@ -1,12 +1,17 @@
 <?php
 /**
- * AdminZeyvroTurnstileController
- * Settings panel and log for zeyvro_turnstile module.
+ * Zeyvro - Cloudflare Turnstile for PrestaShop
  *
- * @author  Zeyvro <hola@zeyvro.com>
- * @license MIT
+ * NOTICE OF LICENSE
  *
- * @see    https://zeyvro.com
+ * This source file is subject to the MIT License
+ * that is bundled with this package in the file LICENSE.md.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/MIT
+ *
+ * @author    Zeyvro <admin@zeyvro.com>
+ * @copyright 2026 Zeyvro
+ * @license   https://opensource.org/licenses/MIT  MIT License
  */
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -102,7 +107,7 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
             Configuration::updateValue($key, $val);
         }
 
-        $this->confirmations[] = $this->l('Configuración guardada correctamente.');
+        $this->confirmations[] = $this->l('Settings saved successfully.');
     }
 
     private function clearOldLogs(): void
@@ -112,7 +117,7 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
             'zeyvro_turnstile_log',
             "date_add < '" . pSQL($cutoff) . "'"
         );
-        $this->confirmations[] = $this->l('Logs de más de 30 días eliminados.');
+        $this->confirmations[] = $this->l('Logs older than 30 days have been deleted.');
     }
 
     /* =====================================================================
@@ -152,38 +157,38 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
         $fields = [
             [
                 'type' => 'switch',
-                'label' => $this->l('Activar Turnstile'),
+                'label' => $this->l('Enable Turnstile'),
                 'name' => 'ZEYVRO_TURNSTILE_ENABLED',
                 'is_bool' => true,
                 'values' => [
-                    ['id' => 'ZEYVRO_TURNSTILE_ENABLED_on',  'value' => 1, 'label' => $this->l('Sí')],
+                    ['id' => 'ZEYVRO_TURNSTILE_ENABLED_on',  'value' => 1, 'label' => $this->l('Yes')],
                     ['id' => 'ZEYVRO_TURNSTILE_ENABLED_off', 'value' => 0, 'label' => $this->l('No')],
                 ],
-                'desc' => $this->l('Desactívalo para deshabilitar temporalmente sin desinstalar.'),
+                'desc' => $this->l('Disable it to temporarily deactivate without uninstalling.'),
             ],
             [
                 'type' => 'password',
                 'label' => $this->l('Site Key'),
                 'name' => 'ZEYVRO_TURNSTILE_SITE_KEY',
                 'required' => true,
-                'desc' => $this->l('Clave pública del widget. Deja en blanco al guardar para conservar el valor actual.'),
+                'desc' => $this->l('Public widget key. Leave blank when saving to keep the current value.'),
             ],
             [
                 'type' => 'password',
                 'label' => $this->l('Secret Key'),
                 'name' => 'ZEYVRO_TURNSTILE_SECRET_KEY',
                 'required' => true,
-                'desc' => $this->l('Clave secreta para verificar el token en el servidor. Nunca la expongas. Deja este campo en blanco al guardar para conservar el valor actual.'),
+                'desc' => $this->l('Secret key to verify the token on the server. Never expose it. Leave this field blank when saving to keep the current value.'),
             ],
             [
                 'type' => 'select',
-                'label' => $this->l('Modo del widget'),
+                'label' => $this->l('Widget mode'),
                 'name' => 'ZEYVRO_TURNSTILE_MODE',
                 'options' => [
                     'query' => [
-                        ['id' => 'managed',        'name' => $this->l('Managed (automático, recomendado)')],
-                        ['id' => 'non-interactive', 'name' => $this->l('Non-interactive (sin clic)')],
-                        ['id' => 'invisible',       'name' => $this->l('Invisible (sin widget visible)')],
+                        ['id' => 'managed',        'name' => $this->l('Managed (automatic, recommended)')],
+                        ['id' => 'non-interactive', 'name' => $this->l('Non-interactive (no click)')],
+                        ['id' => 'invisible',       'name' => $this->l('Invisible (no visible widget)')],
                     ],
                     'id' => 'id',
                     'name' => 'name',
@@ -191,47 +196,47 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
             ],
             [
                 'type' => 'select',
-                'label' => $this->l('Acción si falla la verificación'),
+                'label' => $this->l('Action on verification failure'),
                 'name' => 'ZEYVRO_TURNSTILE_ACTION_ON_FAIL',
                 'options' => [
                     'query' => [
-                        ['id' => 'block',    'name' => $this->l('Bloquear envío (recomendado)')],
-                        ['id' => 'log_only', 'name' => $this->l('Solo registrar (dejar pasar)')],
+                        ['id' => 'block',    'name' => $this->l('Block submission (recommended)')],
+                        ['id' => 'log_only', 'name' => $this->l('Log only (allow through)')],
                     ],
                     'id' => 'id',
                     'name' => 'name',
                 ],
-                'desc' => $this->l('En "solo registrar" el formulario se envía aunque falle Turnstile.'),
+                'desc' => $this->l('In "log only" mode the form is submitted even if Turnstile fails.'),
             ],
             [
                 'type' => 'switch',
-                'label' => $this->l('Registrar intentos'),
+                'label' => $this->l('Log attempts'),
                 'name' => 'ZEYVRO_TURNSTILE_LOG_ENABLED',
                 'is_bool' => true,
                 'values' => [
-                    ['id' => 'ZEYVRO_TURNSTILE_LOG_ENABLED_on',  'value' => 1, 'label' => $this->l('Sí')],
+                    ['id' => 'ZEYVRO_TURNSTILE_LOG_ENABLED_on',  'value' => 1, 'label' => $this->l('Yes')],
                     ['id' => 'ZEYVRO_TURNSTILE_LOG_ENABLED_off', 'value' => 0, 'label' => $this->l('No')],
                 ],
             ],
             [
                 'type' => 'text',
-                'label' => $this->l('Timeout API (segundos)'),
+                'label' => $this->l('API timeout (seconds)'),
                 'name' => 'ZEYVRO_TURNSTILE_API_TIMEOUT',
                 'class' => 'fixed-width-sm',
-                'desc' => $this->l('Tiempo máximo de espera para la llamada a Cloudflare. Por defecto: 5.'),
+                'desc' => $this->l('Maximum wait time for the Cloudflare API call. Default: 5.'),
             ],
         ];
 
         $form = [
             'form' => [
                 'legend' => [
-                    'title' => $this->l('Configuración de Turnstile'),
+                    'title' => $this->l('Turnstile Configuration'),
                     'icon' => 'icon-shield',
                 ],
                 'input' => $fields,
                 'submit' => [
                     'name' => 'submitZeyvroTurnstile',
-                    'title' => $this->l('Guardar'),
+                    'title' => $this->l('Save'),
                 ],
             ],
         ];

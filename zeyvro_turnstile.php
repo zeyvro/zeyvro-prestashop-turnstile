@@ -1,12 +1,17 @@
 <?php
 /**
- * Zeyvro — Turnstile Anti-Spam
- * Cloudflare Turnstile on the PrestaShop 8 contact form.
+ * Zeyvro - Cloudflare Turnstile for PrestaShop
  *
- * @author  Zeyvro <hola@zeyvro.com>
- * @license MIT
+ * NOTICE OF LICENSE
  *
- * @see    https://zeyvro.com
+ * This source file is subject to the MIT License
+ * that is bundled with this package in the file LICENSE.md.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/MIT
+ *
+ * @author    Zeyvro <admin@zeyvro.com>
+ * @copyright 2026 Zeyvro
+ * @license   https://opensource.org/licenses/MIT  MIT License
  */
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -42,7 +47,7 @@ class Zeyvro_Turnstile extends Module
     {
         $this->name = 'zeyvro_turnstile';
         $this->tab = 'other';
-        $this->version = '1.0.10';
+        $this->version = '1.1.0';
         $this->author = 'Zeyvro';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => '9.99.99'];

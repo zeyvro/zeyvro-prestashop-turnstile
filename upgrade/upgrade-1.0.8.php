@@ -1,9 +1,17 @@
 <?php
 /**
- * @author  Zeyvro <hola@zeyvro.com>
- * @license MIT
+ * Zeyvro - Cloudflare Turnstile for PrestaShop
  *
- * @see    https://zeyvro.com
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT License
+ * that is bundled with this package in the file LICENSE.md.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/MIT
+ *
+ * @author    Zeyvro <admin@zeyvro.com>
+ * @copyright 2026 Zeyvro
+ * @license   https://opensource.org/licenses/MIT  MIT License
  */
 /**
  * Upgrade 1.0.8 — Adopta ZeyvroModuleTrait como base común.

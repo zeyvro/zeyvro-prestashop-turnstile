@@ -16,10 +16,20 @@
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-header('Cache-Control: no-store, no-cache, must-revalidate');
-header('Cache-Control: post-check=0, pre-check=0', false);
-header('Pragma: no-cache');
-header('Location: ../');
-exit;
+
+function upgrade_module_1_1_0(Module $module): bool
+{
+    try {
+        $module->ensureTabs();
+        $module->clearAllCaches();
+
+        return true;
+    } catch (Exception $e) {
+        PrestaShopLogger::addLog(
+            'zeyvro_turnstile upgrade-1.1.0 error: ' . $e->getMessage(),
+            3, null, 'zeyvro_turnstile', 0, true
+        );
+
+        return true;
+    }
+}

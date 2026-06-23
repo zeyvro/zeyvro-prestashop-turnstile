@@ -5,6 +5,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ---
 
+## 1.1.0 — 2026-06-23
+
+### Changed (Validator PS — esqueleto canónico)
+- **Licencias (objetivo: 0)**: cabecera de licencia LARGA (NOTICE OF LICENSE + MIT + @copyright) aplicada a TODOS los .php del módulo. Sustituye el bloque de una línea `@license MIT` anterior. Formato del generador oficial PrestaShop.
+- **config.xml**: `<displayName>` cambiado de `Turnstile Anti-Spam` a `Zeyvro Turnstile` para coincidir exactamente con `$this->displayName`. `<version>` → 1.1.0.
+- **i18n / inglés**: todos los strings fuente en PHP y Smarty traducidos al inglés. Hashes de `en.php` y `es.php` regenerados en consecuencia.
+- **Compatibilidad**: `Language::getLanguages(true)` protegido con `?: []` en `ZeyvroModuleTrait.php` y `upgrade-1.0.7.php`.
+- **Anuncios**: textos de `renderZeyvroAds()` en inglés.
+- **php-cs-fixer**: 0 archivos modificados (código ya conforme).
+
+### Added
+- `upgrade/upgrade-1.1.0.php`: script de upgrade idempotente (ensureTabs + clearAllCaches).
+- Guard `_PS_VERSION_` en todos los `index.php` de seguridad que no lo tenían.
+
+---
+
 ## 1.0.10 — 2026-06-22
 
 ### Fixed (Fase 3 — PS9 compat)

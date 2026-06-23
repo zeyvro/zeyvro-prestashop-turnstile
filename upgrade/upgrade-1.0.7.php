@@ -1,9 +1,17 @@
 <?php
 /**
- * @author  Zeyvro <hola@zeyvro.com>
- * @license MIT
+ * Zeyvro - Cloudflare Turnstile for PrestaShop
  *
- * @see    https://zeyvro.com
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT License
+ * that is bundled with this package in the file LICENSE.md.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/MIT
+ *
+ * @author    Zeyvro <admin@zeyvro.com>
+ * @copyright 2026 Zeyvro
+ * @license   https://opensource.org/licenses/MIT  MIT License
  */
 /**
  * Upgrade 1.0.7 — Repara la jerarquía de tabs al patrón canónico AdminZeyvroParent.
@@ -50,7 +58,7 @@ function upgrade_module_1_0_7(Module $module): bool
             $parent->active = true;
             $parent->class_name = 'AdminZeyvroParent';
             $parent->name = [];
-            foreach (Language::getLanguages(true) as $lang) {
+            foreach ((Language::getLanguages(true) ?: []) as $lang) {
                 $parent->name[$lang['id_lang']] = 'Zeyvro';
             }
             $parent->id_parent = $id_target_parent;
@@ -110,7 +118,7 @@ function upgrade_module_1_0_7(Module $module): bool
             $tab->module = $module->name;
             $tab->active = true;
             $tab->icon = 'verified_user';
-            foreach (Language::getLanguages(true) as $lang) {
+            foreach ((Language::getLanguages(true) ?: []) as $lang) {
                 $tab->name[$lang['id_lang']] = 'Anti SPAM';
             }
             $tab->save();
@@ -120,7 +128,7 @@ function upgrade_module_1_0_7(Module $module): bool
             $tab->active = true;
             $tab->class_name = 'AdminZeyvroTurnstile';
             $tab->name = [];
-            foreach (Language::getLanguages(true) as $lang) {
+            foreach ((Language::getLanguages(true) ?: []) as $lang) {
                 $tab->name[$lang['id_lang']] = 'Anti SPAM';
             }
             $tab->id_parent = $id_zeyvro_parent;
