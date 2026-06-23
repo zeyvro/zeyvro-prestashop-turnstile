@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Zeyvro - Cloudflare Turnstile for PrestaShop
  *
@@ -13,7 +14,7 @@
  * @copyright 2026 Zeyvro
  * @license   https://opensource.org/licenses/MIT  MIT License
  */
-/**
+/*
  * Upgrade 1.0.7 — Repara la jerarquía de tabs al patrón canónico AdminZeyvroParent.
  *
  * Problema en 1.0.6: el tab se creó bajo AdminParentLocalization (Internacional) y/o

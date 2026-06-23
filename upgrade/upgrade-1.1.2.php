@@ -18,7 +18,22 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_1_0_2(Module $module): bool
+function upgrade_module_1_1_2(Module $module): bool
 {
-    return true;
+    try {
+        if (function_exists('opcache_reset')) {
+            @opcache_reset();
+        }
+        @Tools::clearSmartyCache();
+        @Media::clearCache();
+
+        return true;
+    } catch (Exception $e) {
+        PrestaShopLogger::addLog(
+            'zeyvro_turnstile upgrade-1.1.2 error: ' . $e->getMessage(),
+            3, null, 'zeyvro_turnstile', 0, true
+        );
+
+        return true;
+    }
 }

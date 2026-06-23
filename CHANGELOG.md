@@ -5,6 +5,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ---
 
+## 1.1.2 — 2026-06-23
+
+### Fixed (Validator PS — Standards)
+- **STANDARDS**: habilitadas las reglas `blank_line_after_opening_tag` y `phpdoc_to_comment` en `.php-cs-fixer.dist.php`. PHP CS Fixer 3.x preserva el primer `/**` de cada fichero (file-header de licencia) como `/**`; solo convierte `/**` secundarios no estructurales a `/*`. Los `index.php` de seguridad y los headers de licencia quedan intactos (Licenses sigue en 0). Verificado dry-run = 0 pendientes.
+- **STANDARDS**: en `upgrade/upgrade-1.0.7.php` y `upgrade/upgrade-1.0.8.php`, el bloque de descripción `/**` convertido a `/*` (era un docblock no estructural).
+- Blank line añadida tras `<?php` en los 22 ficheros PHP del módulo (regla `blank_line_after_opening_tag`).
+- La barrera irreducible `no_alternative_syntax => false` se mantiene (guard del trait `ZeyvroModuleTrait.php`).
+
+### Added
+- `upgrade/upgrade-1.1.2.php`: script de upgrade idempotente (limpieza de caché).
+
+### Changed
+- Gold template (zeyvro_template / feature/ps9-scaffold-fixes): `.php-cs-fixer.dist.php` propagado con las mismas 2 reglas habilitadas. Los módulos futuros nacen ya conformes.
+
+---
+
 ## 1.1.1 — 2026-06-23
 
 ### Fixed (Validator PS — Requirements + Compatibility + Optimizations + Standards)

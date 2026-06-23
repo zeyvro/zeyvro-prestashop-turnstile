@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Zeyvro - Cloudflare Turnstile for PrestaShop
  *
@@ -13,7 +14,7 @@
  * @copyright 2026 Zeyvro
  * @license   https://opensource.org/licenses/MIT  MIT License
  */
-/**
+/*
  * Upgrade 1.0.8 — Adopta ZeyvroModuleTrait como base común.
  *
  * Cambios: elimina lógica de tab/caché ad-hoc; pasa a usar ensureTabs()

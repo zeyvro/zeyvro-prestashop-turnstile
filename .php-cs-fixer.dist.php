@@ -39,24 +39,24 @@ return (new Config())
         'yoda_style' => false,
         'non_printable_character' => true,
         'no_superfluous_phpdoc_tags' => false,
-        // ⚠ BARRERAS IRREDUCIBLES — NO habilitar ninguna de las siguientes:
-        // Son contradicciones internas del Validator PS; NO arreglar. Standards no es auto-decline.
+        // ── Reglas habilitadas tras verificación con Validator real (v1.1.2) ──────
         //
-        // 1) blank_line_after_opening_tag: añade una línea en blanco entre <?php y el
-        //    docblock de licencia. El check "Licenses" del Validator exige que NO haya
-        //    línea en blanco ahí ("no blank lines before file comment"). Habilitarla
-        //    produce regresiones Licenses.
+        // blank_line_after_opening_tag: añade blank line tras <?php en todos los
+        // ficheros. PHP CS Fixer 3.x trata el primer /** del fichero como file-header
+        // y NO lo desplaza; el check Licenses sigue en 0.
+        // Validator PS requiere esta regla: Standards=4 sin ella.
+        'blank_line_after_opening_tag' => true,
         //
-        // 2) no_alternative_syntax: convierte if/endif a llaves {}. El parser estático
-        //    del Validator PS no detecta `trait X {}` dentro de un if(){} estándar, pero
-        //    sí lo detecta dentro de if(...):...endif;. Convertir el guard de
-        //    ZeyvroModuleTrait.php rompería el check Requirements. Ver REGLAS-DURAS §trampas.
+        // phpdoc_to_comment: convierte /** no-estructurales a /* ordinario.
+        // PHP CS Fixer 3.x preserva el primer /** (file-header) como /** — los
+        // index.php de seguridad y los headers de licencia quedan intactos.
+        // Solo convierte /** secundarios (ej. comentarios de descripción en upgrade/).
+        'phpdoc_to_comment' => true,
         //
-        // 3) phpdoc_to_comment: convierte bloques /** sin @param/@return a /* ordinario.
-        //    El Validator PS exige /** (docblock) para el file comment de los index.php
-        //    de seguridad ("You must use /** style comments for a file comment").
-        'blank_line_after_opening_tag' => false,
+        // ── BARRERA IRREDUCIBLE — NO habilitar: ─────────────────────────────────
+        // no_alternative_syntax: convertiría if/endif a {}. El parser estático del
+        // Validator PS detecta `trait X {}` solo dentro de if(...):...endif; en
+        // ZeyvroModuleTrait.php. Rompe el check Requirements. Ver REGLAS-DURAS §trampas.
         'no_alternative_syntax' => false,
-        'phpdoc_to_comment' => false,
     ])
     ->setFinder($finder);
