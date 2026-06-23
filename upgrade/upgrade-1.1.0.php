@@ -17,9 +17,10 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_1_0_10(Module $module): bool
+function upgrade_module_1_1_0(Module $module): bool
 {
     try {
+        // ensureTabs() se ejecuta en el siguiente hook BO vía auto-reparación
         if (function_exists('opcache_reset')) {
             @opcache_reset();
         }
@@ -29,7 +30,7 @@ function upgrade_module_1_0_10(Module $module): bool
         return true;
     } catch (Exception $e) {
         PrestaShopLogger::addLog(
-            'zeyvro_turnstile upgrade-1.0.10 error: ' . $e->getMessage(),
+            'zeyvro_turnstile upgrade-1.1.0 error: ' . $e->getMessage(),
             3, null, 'zeyvro_turnstile', 0, true
         );
 

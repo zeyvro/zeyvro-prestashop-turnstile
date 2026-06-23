@@ -5,17 +5,88 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ---
 
+## 1.1.3 — 2026-06-23
+
+### Fixed (Validator PS — Licenses)
+- **LICENSES**: revertida la regla `blank_line_after_opening_tag` a `false`. Habilitarla en v1.1.2 rompió Licenses 0→23 (módulo 3740522): el Validator PS exige "There must be no blank lines before the file comment" (la cabecera `/** licencia */` debe ir pegada a `<?php`). La blank line introducida por v1.1.2 se elimina de los 23 ficheros PHP del módulo.
+- `phpdoc_to_comment => true` se mantiene (no afecta Licenses; solo convierte `/**` secundarios no estructurales a `/*`).
+- **Standards residuales por `blank_line_after_opening_tag` son IRREDUCIBLES**: contradicción interna del Validator (exige la blank line en Standards pero la prohíbe en Licenses). Documentado en `.php-cs-fixer.dist.php`.
+
+### Added
+- `upgrade/upgrade-1.1.3.php`: script de upgrade idempotente (limpieza de caché).
+
+### Changed
+- Gold template (zeyvro_template / feature/ps9-scaffold-fixes): `.php-cs-fixer.dist.php` propagado con `blank_line_after_opening_tag => false` y la misma barrera documentada.
+
+---
+
+## 1.1.2 — 2026-06-23
+
+### Fixed (Validator PS — Standards)
+- **STANDARDS**: habilitadas las reglas `blank_line_after_opening_tag` y `phpdoc_to_comment` en `.php-cs-fixer.dist.php`. PHP CS Fixer 3.x preserva el primer `/**` de cada fichero (file-header de licencia) como `/**`; solo convierte `/**` secundarios no estructurales a `/*`. Los `index.php` de seguridad y los headers de licencia quedan intactos (Licenses sigue en 0). Verificado dry-run = 0 pendientes.
+- **STANDARDS**: en `upgrade/upgrade-1.0.7.php` y `upgrade/upgrade-1.0.8.php`, el bloque de descripción `/**` convertido a `/*` (era un docblock no estructural).
+- Blank line añadida tras `<?php` en los 22 ficheros PHP del módulo (regla `blank_line_after_opening_tag`).
+- La barrera irreducible `no_alternative_syntax => false` se mantiene (guard del trait `ZeyvroModuleTrait.php`).
+
+### Added
+- `upgrade/upgrade-1.1.2.php`: script de upgrade idempotente (limpieza de caché).
+
+### Changed
+- Gold template (zeyvro_template / feature/ps9-scaffold-fixes): `.php-cs-fixer.dist.php` propagado con las mismas 2 reglas habilitadas. Los módulos futuros nacen ya conformes.
+
+---
+
+## 1.1.1 — 2026-06-23
+
+### Fixed (Validator PS — Requirements + Compatibility + Optimizations + Standards)
+- **REQUIREMENTS**: `$this->tab` cambiado de `'other'` (valor inválido) a `'front_office_features'`. Mismo valor en `config.xml <tab>`.
+- **COMPATIBILITY**: eliminada la funcionalidad "Zeyvro Ads" (`renderZeyvroAds()` del trait y la llamada en `AdminZeyvroTurnstileController`). Motivo: Addons PS no permite promocionar productos/enlaces fuera de Addons.
+- **COMPATIBILITY**: reemplazadas todas las llamadas `$module->clearAllCaches()` y `$module->ensureTabs()` en scripts de upgrade (`1.0.6`, `1.0.7`, `1.0.8`, `1.0.10`, `1.1.0`) por llamadas directas a las funciones estándar de PS (`Tools::clearSmartyCache()`, `Media::clearCache()`, `opcache_reset()`). El Validator no resuelve métodos de trait sobre el tipo `Module` en parámetros de funciones.
+- **OPTIMIZATIONS**: `hookDisplayHeader` ya no retorna HTML inline con `<script src="...">`. Registra el JS de Turnstile vía `registerJavascript()` (server remote, position head, async defer).
+- **STANDARDS**: php-cs-fixer 0 archivos pendientes. Barreras irreducibles documentadas en `.php-cs-fixer.dist.php` (no_alternative_syntax del guard trait, blank_line_after_opening_tag).
+
+### Added
+- `upgrade/upgrade-1.1.1.php`: script de upgrade idempotente (limpieza de caché directa).
+
+---
+
+## 1.1.0 — 2026-06-23
+
+### Changed (Validator PS — esqueleto canónico)
+- **Licencias (objetivo: 0)**: cabecera de licencia LARGA (NOTICE OF LICENSE + MIT + @copyright) aplicada a TODOS los .php del módulo. Sustituye el bloque de una línea `@license MIT` anterior. Formato del generador oficial PrestaShop.
+- **config.xml**: `<displayName>` cambiado de `Turnstile Anti-Spam` a `Zeyvro Turnstile` para coincidir exactamente con `$this->displayName`. `<version>` → 1.1.0.
+- **i18n / inglés**: todos los strings fuente en PHP y Smarty traducidos al inglés. Hashes de `en.php` y `es.php` regenerados en consecuencia.
+- **Compatibilidad**: `Language::getLanguages(true)` protegido con `?: []` en `ZeyvroModuleTrait.php` y `upgrade-1.0.7.php`.
+- **Anuncios**: textos de `renderZeyvroAds()` en inglés.
+- **php-cs-fixer**: 0 archivos modificados (código ya conforme).
+
+### Added
+- `upgrade/upgrade-1.1.0.php`: script de upgrade idempotente (ensureTabs + clearAllCaches).
+- Guard `_PS_VERSION_` en todos los `index.php` de seguridad que no lo tenían.
+
+---
+
 ## 1.0.10 — 2026-06-22
 
-### Fixed
+### Fixed (Fase 3 — PS9 compat)
 - **PS9 BLOCKER**: `ModuleAdminControllerCore::l()` fue eliminado en PS9 — añadido wrapper `l()` PS9-safe en `AdminZeyvroTurnstileController` con la firma compatible con PS8 (`$string, $class, $addslashes, $htmlentities`). Sin este fix el panel lanzaba `UndefinedMethodError` → HTTP 500 en PS9.
 - **PS9 BLOCKER**: `ps_versions_compliancy max` era `_PS_VERSION_` → corregido a `'9.99.99'`. Con `_PS_VERSION_` el módulo bloqueaba instalación en PS9 con mensaje "This module is not compatible with your version of PrestaShop".
 - `config.xml` `max` actualizado a `9.99.99`.
 
-### Changed
+### Fixed (Fase 4 — Verified+)
+- **Seguridad**: eliminados `{chr(36)}form_html nofilter}` y `{chr(36)}zeyvro_ads nofilter}` de `settings.tpl`. El form se renderiza via `$this->content` directamente (patrón gold template). Las ads se concatenan en PHP, sin inyección de HTML raw en Smarty. Validator check 14: 0 nofilter.
+- **Compatibilidad**: `->active = 1` → `->active = true` en `ZeyvroModuleTrait.php`, `upgrade-1.0.3.php`, `upgrade-1.0.7.php`.
+- **Compatibilidad**: return types añadidos en los 3 métodos hook (`hookDisplayHeader`, `hookDisplayBeforeBodyClosingTag`, `hookActionFrontControllerSetMedia`).
+- **Licencias .tpl**: cabecera `@license MIT` (comentario Smarty `{* *}`) añadida a `settings.tpl` y `turnstile_widget.tpl`. EOL LF.
+
+### Added (Fase 4 — Verified+)
+- `.php-cs-fixer.dist.php`: ruleset PS oficial con las 3 barreras irreducibles documentadas.
+- `phpstan.neon` paths: `classes/` incluida; `clearSf2Cache` añadido a stubs. PHPStan 0 errores.
+
+### Changed (Fase 3)
 - `composer.json` `license`: `proprietary` → `MIT` (coherente con módulo free).
 
-### Removed
+### Removed (Fase 3)
 - `config_es.xml` eliminado (0 referencias en código; solo causaba warnings en el Validator).
 
 ---

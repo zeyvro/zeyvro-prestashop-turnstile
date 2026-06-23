@@ -1,5 +1,16 @@
-{**
- * Panel de administración — Turnstile Anti-Spam
+{*
+ * Zeyvro - Cloudflare Turnstile for PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT License
+ * that is bundled with this package in the file LICENSE.md.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/MIT
+ *
+ * @author    Zeyvro <admin@zeyvro.com>
+ * @copyright 2026 Zeyvro
+ * @license   https://opensource.org/licenses/MIT  MIT License
  *}
 
 {if $confirmations}
@@ -14,13 +25,11 @@
   {/foreach}
 {/if}
 
-{$form_html nofilter}
-
 <div class="panel">
   <div class="panel-heading">
     <i class="icon-list"></i>
-    {l s='Log de verificaciones (últimas 50)' mod='zeyvro_turnstile'}
-    <span class="badge">{$log_total}</span>
+    {l s='Verification log (last 50)' mod='zeyvro_turnstile'}
+    <span class="badge">{$log_total|escape:'htmlall':'UTF-8'}</span>
   </div>
 
   <div class="panel-body">
@@ -29,11 +38,11 @@
         <table class="table table-bordered table-hover">
           <thead>
             <tr>
-              <th>{l s='Fecha' mod='zeyvro_turnstile'}</th>
+              <th>{l s='Date' mod='zeyvro_turnstile'}</th>
               <th>{l s='IP' mod='zeyvro_turnstile'}</th>
-              <th>{l s='Resultado' mod='zeyvro_turnstile'}</th>
+              <th>{l s='Result' mod='zeyvro_turnstile'}</th>
               <th>{l s='Score' mod='zeyvro_turnstile'}</th>
-              <th>{l s='Errores' mod='zeyvro_turnstile'}</th>
+              <th>{l s='Errors' mod='zeyvro_turnstile'}</th>
               <th>{l s='User-Agent' mod='zeyvro_turnstile'}</th>
             </tr>
           </thead>
@@ -49,8 +58,8 @@
                     <span class="label label-danger">{l s='FAIL' mod='zeyvro_turnstile'}</span>
                   {/if}
                 </td>
-                <td>{if $log.score !== null}{$log.score|escape:'htmlall':'UTF-8'}{else}—{/if}</td>
-                <td>{if $log.error_codes}{$log.error_codes|escape:'htmlall':'UTF-8'}{else}—{/if}</td>
+                <td>{if $log.score !== null}{$log.score|escape:'htmlall':'UTF-8'}{else}&mdash;{/if}</td>
+                <td>{if $log.error_codes}{$log.error_codes|escape:'htmlall':'UTF-8'}{else}&mdash;{/if}</td>
                 <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"
                     title="{$log.user_agent|escape:'htmlall':'UTF-8'}">
                   {$log.user_agent|truncate:60:'...'|escape:'htmlall':'UTF-8'}
@@ -61,21 +70,19 @@
         </table>
       </div>
     {else}
-      <p class="text-muted">{l s='No hay registros todavía.' mod='zeyvro_turnstile'}</p>
+      <p class="text-muted">{l s='No records yet.' mod='zeyvro_turnstile'}</p>
     {/if}
   </div>
 
   <div class="panel-footer">
     <a href="{$clear_url|escape:'htmlall':'UTF-8'}"
        class="btn btn-default btn-sm"
-       onclick="return confirm('{l s='¿Eliminar logs de más de 30 días?' mod='zeyvro_turnstile' js=1}');">
+       onclick="return confirm('{l s='Delete logs older than 30 days?' mod='zeyvro_turnstile' js=1}');">
       <i class="icon-trash"></i>
-      {l s='Limpiar logs >30 días' mod='zeyvro_turnstile'}
+      {l s='Clear logs >30 days' mod='zeyvro_turnstile'}
     </a>
     <small class="text-muted" style="margin-left:10px;">
-      {l s='Total en BD: ' mod='zeyvro_turnstile'}{$log_total}
+      {l s='Total in DB: ' mod='zeyvro_turnstile'}{$log_total|escape:'htmlall':'UTF-8'}
     </small>
   </div>
 </div>
-
-{$zeyvro_ads nofilter}

@@ -120,6 +120,7 @@ class Tools {
     public static function htmlentitiesUTF8(string $str): string { return ''; }
     public static function htmlentitiesDecodeUTF8(string $str): string { return ''; }
     public static function clearSmartyCache(): void {}
+    public static function clearSf2Cache(): void {}
 }
 
 class Validate {

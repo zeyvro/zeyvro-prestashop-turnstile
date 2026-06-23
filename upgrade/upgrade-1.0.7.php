@@ -1,5 +1,19 @@
 <?php
 /**
+ * Zeyvro - Cloudflare Turnstile for PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT License
+ * that is bundled with this package in the file LICENSE.md.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/MIT
+ *
+ * @author    Zeyvro <admin@zeyvro.com>
+ * @copyright 2026 Zeyvro
+ * @license   https://opensource.org/licenses/MIT  MIT License
+ */
+/*
  * Upgrade 1.0.7 — Repara la jerarquía de tabs al patrón canónico AdminZeyvroParent.
  *
  * Problema en 1.0.6: el tab se creó bajo AdminParentLocalization (Internacional) y/o
@@ -7,12 +21,11 @@
  *
  * Este script es IDEMPOTENTE: correrlo dos veces no duplica nada.
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_1_0_7($module)
+function upgrade_module_1_0_7(Module $module): bool
 {
     try {
         $db = Db::getInstance();
@@ -27,6 +40,7 @@ function upgrade_module_1_0_7($module)
                 'zeyvro_turnstile upgrade-1.0.7: no se encontro IMPROVE ni AdminParentModulesSf',
                 3
             );
+
             return false;
         }
 
@@ -41,10 +55,10 @@ function upgrade_module_1_0_7($module)
         if (empty($parents)) {
             // No existe: crear
             $parent = new Tab();
-            $parent->active = 1;
+            $parent->active = true;
             $parent->class_name = 'AdminZeyvroParent';
             $parent->name = [];
-            foreach (Language::getLanguages(true) as $lang) {
+            foreach ((Language::getLanguages(true) ?: []) as $lang) {
                 $parent->name[$lang['id_lang']] = 'Zeyvro';
             }
             $parent->id_parent = $id_target_parent;
@@ -55,6 +69,7 @@ function upgrade_module_1_0_7($module)
                     'zeyvro_turnstile upgrade-1.0.7: fallo al crear AdminZeyvroParent',
                     3
                 );
+
                 return false;
             }
             $id_zeyvro_parent = (int) $parent->id;
@@ -101,19 +116,19 @@ function upgrade_module_1_0_7($module)
             $tab = new Tab($id_child);
             $tab->id_parent = $id_zeyvro_parent;
             $tab->module = $module->name;
-            $tab->active = 1;
+            $tab->active = true;
             $tab->icon = 'verified_user';
-            foreach (Language::getLanguages(true) as $lang) {
+            foreach ((Language::getLanguages(true) ?: []) as $lang) {
                 $tab->name[$lang['id_lang']] = 'Anti SPAM';
             }
             $tab->save();
         } else {
             // No existe: crear
             $tab = new Tab();
-            $tab->active = 1;
+            $tab->active = true;
             $tab->class_name = 'AdminZeyvroTurnstile';
             $tab->name = [];
-            foreach (Language::getLanguages(true) as $lang) {
+            foreach ((Language::getLanguages(true) ?: []) as $lang) {
                 $tab->name[$lang['id_lang']] = 'Anti SPAM';
             }
             $tab->id_parent = $id_zeyvro_parent;
@@ -124,16 +139,19 @@ function upgrade_module_1_0_7($module)
         _upgrade107CreateTabRoles('AdminZeyvroTurnstile', $db);
 
         // -- 5. Cache
-        if (method_exists($module, 'clearAllCaches')) {
-            $module->clearAllCaches();
+        if (function_exists('opcache_reset')) {
+            @opcache_reset();
         }
+        @Tools::clearSmartyCache();
+        @Media::clearCache();
 
         return true;
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         PrestaShopLogger::addLog(
             'zeyvro_turnstile upgrade-1.0.7 error: ' . $e->getMessage(),
             3, null, 'zeyvro_turnstile', 0, true
         );
+
         return true; // nunca WSOD — el boton Actualizar nativo queda como fallback
     }
 }

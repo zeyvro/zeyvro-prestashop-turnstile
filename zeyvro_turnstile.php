@@ -1,34 +1,39 @@
 <?php
 /**
- * Zeyvro — Turnstile Anti-Spam
- * Cloudflare Turnstile on the PrestaShop 8 contact form.
+ * Zeyvro - Cloudflare Turnstile for PrestaShop
  *
- * @author  Zeyvro <hola@zeyvro.com>
- * @license MIT
- * @link    https://zeyvro.com
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT License
+ * that is bundled with this package in the file LICENSE.md.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/MIT
+ *
+ * @author    Zeyvro <admin@zeyvro.com>
+ * @copyright 2026 Zeyvro
+ * @license   https://opensource.org/licenses/MIT  MIT License
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once dirname(__FILE__) . '/classes/ZeyvroModuleTrait.php';
+require_once __DIR__ . '/classes/ZeyvroModuleTrait.php';
 
 class Zeyvro_Turnstile extends Module
 {
     use ZeyvroModuleTrait;
 
     // ── Base común: constantes de identidad ───────────────────────────────
-    const ZV_TAB_CLASS   = 'AdminZeyvroTurnstile';
-    const ZV_TAB_NAME    = 'Anti SPAM';
-    const ZV_TAB_ICON    = 'verified_user';
-    const ZV_ADS_VARIANT  = 'free';
-    const ZV_LICENSE_TYPE = 'free';
-    const ZV_SCHEMA_TABV  = 'A';               // cambiar solo si la estructura de tabs cambia
-    const ZV_SCHEMA_KEY  = 'ZEYVROTURNSTILE_TABV';
+    public const ZV_TAB_CLASS = 'AdminZeyvroTurnstile';
+    public const ZV_TAB_NAME = 'Anti SPAM';
+    public const ZV_TAB_ICON = 'verified_user';
+    public const ZV_ADS_VARIANT = 'free';
+    public const ZV_LICENSE_TYPE = 'free';
+    public const ZV_SCHEMA_TABV = 'A';               // cambiar solo si la estructura de tabs cambia
+    public const ZV_SCHEMA_KEY = 'ZEYVROTURNSTILE_TABV';
 
     // ── Config keys propios del módulo ────────────────────────────────────
-    const CONFIG_KEYS = [
+    public const CONFIG_KEYS = [
         'ZEYVRO_TURNSTILE_ENABLED',
         'ZEYVRO_TURNSTILE_SITE_KEY',
         'ZEYVRO_TURNSTILE_SECRET_KEY',
@@ -40,13 +45,13 @@ class Zeyvro_Turnstile extends Module
 
     public function __construct()
     {
-        $this->name          = 'zeyvro_turnstile';
-        $this->tab           = 'other';
-        $this->version       = '1.0.10';
-        $this->author        = 'Zeyvro';
+        $this->name = 'zeyvro_turnstile';
+        $this->tab = 'front_office_features';
+        $this->version = '1.1.3';
+        $this->author = 'Zeyvro';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => '9.99.99'];
-        $this->bootstrap     = true;
+        $this->bootstrap = true;
 
         parent::__construct();
 
@@ -84,13 +89,14 @@ class Zeyvro_Turnstile extends Module
         $this->unregisterHook('displayHeader');
         $this->unregisterHook('displayBeforeBodyClosingTag');
         $this->unregisterHook('actionFrontControllerSetMedia');
+
         return parent::uninstall();
     }
 
     private function installSql(): bool
     {
-        return Db::getInstance()->execute("
-            CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "zeyvro_turnstile_log` (
+        return Db::getInstance()->execute('
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . "zeyvro_turnstile_log` (
                 `id_log`      INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
                 `ip`          VARCHAR(45)  NOT NULL DEFAULT '',
                 `user_agent`  VARCHAR(255) NOT NULL DEFAULT '',
@@ -107,17 +113,18 @@ class Zeyvro_Turnstile extends Module
     private function installConfig(): bool
     {
         $defaults = [
-            'ZEYVRO_TURNSTILE_ENABLED'       => 0,
-            'ZEYVRO_TURNSTILE_SITE_KEY'       => '',
-            'ZEYVRO_TURNSTILE_SECRET_KEY'     => '',
-            'ZEYVRO_TURNSTILE_MODE'           => 'managed',
+            'ZEYVRO_TURNSTILE_ENABLED' => 0,
+            'ZEYVRO_TURNSTILE_SITE_KEY' => '',
+            'ZEYVRO_TURNSTILE_SECRET_KEY' => '',
+            'ZEYVRO_TURNSTILE_MODE' => 'managed',
             'ZEYVRO_TURNSTILE_ACTION_ON_FAIL' => 'block',
-            'ZEYVRO_TURNSTILE_LOG_ENABLED'    => 1,
-            'ZEYVRO_TURNSTILE_API_TIMEOUT'    => 5,
+            'ZEYVRO_TURNSTILE_LOG_ENABLED' => 1,
+            'ZEYVRO_TURNSTILE_API_TIMEOUT' => 5,
         ];
         foreach ($defaults as $k => $v) {
             Configuration::updateValue($k, $v);
         }
+
         return true;
     }
 
@@ -135,7 +142,7 @@ class Zeyvro_Turnstile extends Module
     /**
      * Inyecta el script de la API de Turnstile solo en la página de contacto.
      */
-    public function hookDisplayHeader($params)
+    public function hookDisplayHeader($params): string
     {
         if (!(int) Configuration::get('ZEYVRO_TURNSTILE_ENABLED')) {
             return '';
@@ -149,13 +156,20 @@ class Zeyvro_Turnstile extends Module
         if (empty(Configuration::get('ZEYVRO_TURNSTILE_SITE_KEY'))) {
             return '';
         }
-        return '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>';
+
+        $this->context->controller->registerJavascript(
+            'turnstile-api',
+            'https://challenges.cloudflare.com/turnstile/v0/api.js',
+            ['server' => 'remote', 'position' => 'head', 'priority' => 150, 'attributes' => 'async defer']
+        );
+
+        return '';
     }
 
     /**
      * Inyecta el widget Turnstile en el formulario de contacto vía JS.
      */
-    public function hookDisplayBeforeBodyClosingTag($params)
+    public function hookDisplayBeforeBodyClosingTag($params): string
     {
         if (!(int) Configuration::get('ZEYVRO_TURNSTILE_ENABLED')) {
             return '';
@@ -174,15 +188,16 @@ class Zeyvro_Turnstile extends Module
 
         $this->context->smarty->assign([
             'sbt_site_key' => $siteKey,
-            'sbt_mode'     => $mode,
+            'sbt_mode' => $mode,
         ]);
+
         return $this->display(__FILE__, 'views/templates/front/turnstile_widget.tpl');
     }
 
     /**
      * Validación server-side del token Turnstile en el formulario de contacto.
      */
-    public function hookActionFrontControllerSetMedia($params)
+    public function hookActionFrontControllerSetMedia($params): void
     {
         if (!(int) Configuration::get('ZEYVRO_TURNSTILE_ENABLED')) {
             return;
@@ -200,9 +215,9 @@ class Zeyvro_Turnstile extends Module
             return;
         }
 
-        $token    = (string) Tools::getValue('cf-turnstile-response', '');
+        $token = (string) Tools::getValue('cf-turnstile-response', '');
         $remoteIp = Tools::getRemoteAddr();
-        $result   = $this->verifyCloudflareTurnstile($secretKey, $token, $remoteIp);
+        $result = $this->verifyCloudflareTurnstile($secretKey, $token, $remoteIp);
 
         $this->logVerification($remoteIp, $result);
 
@@ -220,31 +235,32 @@ class Zeyvro_Turnstile extends Module
 
     private function verifyCloudflareTurnstile(string $secret, string $token, string $remoteIp): array
     {
-        $timeout  = max(1, (int) Configuration::get('ZEYVRO_TURNSTILE_API_TIMEOUT'));
+        $timeout = max(1, (int) Configuration::get('ZEYVRO_TURNSTILE_API_TIMEOUT'));
         $endpoint = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
         $postData = http_build_query([
-            'secret'   => $secret,
+            'secret' => $secret,
             'response' => $token,
             'remoteip' => $remoteIp,
         ]);
 
         $ch = curl_init($endpoint);
         curl_setopt_array($ch, [
-            CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => $postData,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $postData,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => $timeout,
+            CURLOPT_TIMEOUT => $timeout,
             CURLOPT_CONNECTTIMEOUT => $timeout,
             CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_HTTPHEADER     => ['Content-Type: application/x-www-form-urlencoded'],
+            CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
         ]);
-        $response  = curl_exec($ch);
+        $response = curl_exec($ch);
         $curlError = curl_error($ch);
         curl_close($ch);
 
         if ($response === false || !empty($curlError)) {
             PrestaShopLogger::addLog('[zeyvro_turnstile] cURL error: ' . $curlError, 3);
+
             return ['success' => false, 'error_codes' => ['network-error'], 'score' => null];
         }
 
@@ -254,9 +270,9 @@ class Zeyvro_Turnstile extends Module
         }
 
         return [
-            'success'     => !empty($data['success']),
+            'success' => !empty($data['success']),
             'error_codes' => $data['error-codes'] ?? [],
-            'score'       => isset($data['score']) ? (float) $data['score'] : null,
+            'score' => isset($data['score']) ? (float) $data['score'] : null,
         ];
     }
 
@@ -265,15 +281,15 @@ class Zeyvro_Turnstile extends Module
         if (!(int) Configuration::get('ZEYVRO_TURNSTILE_LOG_ENABLED')) {
             return;
         }
-        $ua         = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+        $ua = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
         $errorCodes = !empty($result['error_codes']) ? implode(',', $result['error_codes']) : null;
 
         Db::getInstance()->insert('zeyvro_turnstile_log', [
-            'ip'          => pSQL($ip),
-            'user_agent'  => pSQL(Tools::substr($ua, 0, 255)),
-            'date_add'    => date('Y-m-d H:i:s'),
-            'success'     => (int) $result['success'],
-            'score'       => $result['score'] !== null ? (float) $result['score'] : null,
+            'ip' => pSQL($ip),
+            'user_agent' => pSQL(Tools::substr($ua, 0, 255)),
+            'date_add' => date('Y-m-d H:i:s'),
+            'success' => (int) $result['success'],
+            'score' => $result['score'] !== null ? (float) $result['score'] : null,
             'error_codes' => $errorCodes !== null ? pSQL($errorCodes) : null,
         ]);
     }
@@ -295,7 +311,7 @@ class Zeyvro_Turnstile extends Module
             if (!$installed || !preg_match('/^\d+\.\d+\.\d+$/', $installed)) {
                 return;
             }
-            $xmlPath = dirname(__FILE__) . '/config.xml';
+            $xmlPath = __DIR__ . '/config.xml';
             if (!file_exists($xmlPath)) {
                 return;
             }
@@ -311,11 +327,12 @@ class Zeyvro_Turnstile extends Module
                 return;
             }
             define('ZEYVROTURNSTILE_UPGRADING', true);
-            $scripts = glob(dirname(__FILE__) . '/upgrade/upgrade-*.php');
+            $scripts = glob(__DIR__ . '/upgrade/upgrade-*.php');
             if ($scripts) {
                 usort($scripts, function ($a, $b) {
                     $va = preg_replace('/.*upgrade-(.+)\.php$/', '$1', $a);
                     $vb = preg_replace('/.*upgrade-(.+)\.php$/', '$1', $b);
+
                     return version_compare($va, $vb);
                 });
                 foreach ($scripts as $script) {
@@ -328,6 +345,7 @@ class Zeyvro_Turnstile extends Module
                                 'zeyvro_turnstile: upgrade script ' . $sv . ' failed',
                                 3, null, 'zeyvro_turnstile', 0, true
                             );
+
                             return;
                         }
                     }
@@ -340,7 +358,7 @@ class Zeyvro_Turnstile extends Module
             );
             $this->ensureTabs();
             $this->clearAllCaches();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             PrestaShopLogger::addLog(
                 'zeyvro_turnstile auto-upgrade error: ' . $e->getMessage(),
                 3, null, 'zeyvro_turnstile', 0, true

@@ -1,6 +1,10 @@
-{**
+{*
  * Turnstile widget injection template.
  * Renderizado via hookDisplayBeforeBodyClosingTag solo en la página de contacto.
+ *
+ * @author  Zeyvro <hola@zeyvro.com>
+ * @license MIT
+ * @link    https://zeyvro.com
  *}
 
 <div id="sbt-placeholder"
