@@ -1,10 +1,18 @@
-# Apache 2.2
+# Impide listado de directorio; los assets estáticos (css/js/img) se sirven con normalidad.
+
+Options -Indexes
+
+# Bloquea ejecución directa de PHP (Apache 2.2)
 <IfModule mod_authz_host.c>
-    Order deny,allow
-    Deny from all
+    <FilesMatch "\.php$">
+        Order deny,allow
+        Deny from all
+    </FilesMatch>
 </IfModule>
 
-# Apache 2.4
+# Bloquea ejecución directa de PHP (Apache 2.4)
 <IfModule mod_authz_core.c>
-    Require all denied
+    <FilesMatch "\.php$">
+        Require all denied
+    </FilesMatch>
 </IfModule>
