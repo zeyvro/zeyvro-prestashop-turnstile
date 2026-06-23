@@ -5,6 +5,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ---
 
+## 1.1.4 — 2026-06-23
+
+### Fixed
+- **Security / .htaccess raíz**: el `.htaccess` anterior usaba `Require all denied` (Apache 2.4) y `Deny from all` (Apache 2.2) de forma global, bloqueando todos los ficheros del módulo, incluidos `views/css/*.css` y `views/js/*.js`. Con CCC desactivado Apache servía directamente esos assets → HTTP 403. Se reemplaza por `Options -Indexes` (impide listado de directorio) + `<FilesMatch "\.php$">` (bloquea solo ejecución directa de PHP). Assets estáticos se sirven con 200.
+
+### Added
+- `upgrade/upgrade-1.1.4.php`: script de upgrade idempotente (limpieza de caché).
+
+---
+
 ## 1.1.3 — 2026-06-23
 
 ### Fixed (Validator PS — Licenses)
