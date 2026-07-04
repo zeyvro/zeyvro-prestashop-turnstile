@@ -47,7 +47,7 @@ class Zeyvro_Turnstile extends Module
     {
         $this->name = 'zeyvro_turnstile';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.4';
+        $this->version = '1.1.5';
         $this->author = 'Zeyvro';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => '9.99.99'];
@@ -149,7 +149,7 @@ class Zeyvro_Turnstile extends Module
         }
         $phpSelf = isset($this->context->controller->php_self)
             ? $this->context->controller->php_self
-            : Tools::getValue('controller');
+            : null;
         if ($phpSelf !== 'contact') {
             return '';
         }
@@ -176,7 +176,7 @@ class Zeyvro_Turnstile extends Module
         }
         $phpSelf = isset($this->context->controller->php_self)
             ? $this->context->controller->php_self
-            : Tools::getValue('controller');
+            : null;
         if ($phpSelf !== 'contact') {
             return '';
         }
