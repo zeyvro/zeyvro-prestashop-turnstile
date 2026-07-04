@@ -12,6 +12,10 @@ desktop.ini
 
 # IDEs
 .idea/
+.vscode/
+
+# php-cs-fixer
+.php-cs-fixer.cache
 
 # Backups y temporales
 *.bak
