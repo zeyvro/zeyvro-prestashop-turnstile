@@ -5,6 +5,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ---
 
+## 1.1.5 — 2026-07-04
+
+### Fixed
+- **Trait unificado al canon FULL** (`_shared/ZeyvroModuleTrait.php`): `classes/ZeyvroModuleTrait.php` sustituido por copia verbatim del canon único de la Tanda Trait Fase B — fix del bug opcache en `clearAllCaches()` (`opcache_reset()`/`generateIndex()` síncronos en `install()` podían saturar el pool PHP-FPM). Sin cambio de comportamiento observable: el módulo no invoca `renderZeyvroAds()`.
+
+### Added
+- `upgrade/upgrade-1.1.5.php`: script de upgrade idempotente (limpieza de caché, sin opcache_reset).
+
+---
+
 ## 1.1.4 — 2026-06-23
 
 ### Fixed

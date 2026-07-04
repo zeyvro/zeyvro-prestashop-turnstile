@@ -43,7 +43,7 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
      */
     public function l($string, $class = null, $addslashes = false, $htmlentities = true): string
     {
-        return $this->module->l($string);
+        return $this->module->l($string, basename(__FILE__, '.php'));
     }
     /* =====================================================================
      * POST PROCESSING (form save + clear logs)
