@@ -15,7 +15,12 @@ $finder = Finder::create()
     ->in(__DIR__)
     ->exclude(['vendor', 'node_modules', '_dist'])
     ->name('*.php')
-    ->notName('*.phtml');
+    ->notName('*.phtml')
+    // classes/ZeyvroModuleTrait.php es copia VERBATIM del canon _shared/
+    // ZeyvroModuleTrait.php (check 43 verify-module-build.py exige byte-
+    // identidad); cs-fixer reindenta su bloque if(...):...endif; y lo
+    // desincroniza. Fuera de alcance (hallazgo 2026-07-05).
+    ->notPath('classes/ZeyvroModuleTrait.php');
 
 return (new Config())
     ->setRiskyAllowed(true)
