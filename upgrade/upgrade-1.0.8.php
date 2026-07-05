@@ -1,27 +1,17 @@
 <?php
 /**
- * Zeyvro - Cloudflare Turnstile for PrestaShop
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the MIT License
- * that is bundled with this package in the file LICENSE.md.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/MIT
+ * Zeyvro PrestaShop Module
  *
  * @author    Zeyvro <admin@zeyvro.com>
  * @copyright 2026 Zeyvro
  * @license   https://opensource.org/licenses/MIT  MIT License
  */
 /*
- * Upgrade 1.0.8 — Adopta ZeyvroModuleTrait como base común.
+ * Zeyvro PrestaShop Module
  *
- * Cambios: elimina lógica de tab/caché ad-hoc; pasa a usar ensureTabs()
- * idempotente del trait. Registra hook actionAdminControllerSetMedia para
- * auto-reparación en futuros upgrades sin desinstalar.
- * Uninstall pasa a ser preservativo (conserva tabla de logs y configuración).
- *
- * Idempotente: correr 2× no duplica ni rompe nada.
+ * @author    Zeyvro <admin@zeyvro.com>
+ * @copyright 2026 Zeyvro
+ * @license   https://opensource.org/licenses/MIT  MIT License
  */
 if (!defined('_PS_VERSION_')) {
     exit;

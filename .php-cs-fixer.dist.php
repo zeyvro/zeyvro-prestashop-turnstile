@@ -13,7 +13,7 @@ use PhpCsFixer\Finder;
 
 $finder = Finder::create()
     ->in(__DIR__)
-    ->exclude(['vendor', 'node_modules', '_dist', 'translations'])
+    ->exclude(['vendor', 'node_modules', '_dist'])
     ->name('*.php')
     ->notName('*.phtml');
 

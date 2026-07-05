@@ -1,25 +1,17 @@
 <?php
 /**
- * Zeyvro - Cloudflare Turnstile for PrestaShop
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the MIT License
- * that is bundled with this package in the file LICENSE.md.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/MIT
+ * Zeyvro PrestaShop Module
  *
  * @author    Zeyvro <admin@zeyvro.com>
  * @copyright 2026 Zeyvro
  * @license   https://opensource.org/licenses/MIT  MIT License
  */
 /*
- * Upgrade 1.0.7 — Repara la jerarquía de tabs al patrón canónico AdminZeyvroParent.
+ * Zeyvro PrestaShop Module
  *
- * Problema en 1.0.6: el tab se creó bajo AdminParentLocalization (Internacional) y/o
- * se usó AdminZeyvroGroup como parent en lugar de AdminZeyvroParent.
- *
- * Este script es IDEMPOTENTE: correrlo dos veces no duplica nada.
+ * @author    Zeyvro <admin@zeyvro.com>
+ * @copyright 2026 Zeyvro
+ * @license   https://opensource.org/licenses/MIT  MIT License
  */
 if (!defined('_PS_VERSION_')) {
     exit;
