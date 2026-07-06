@@ -5,6 +5,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ---
 
+## 1.1.6 — 2026-07-06
+
+### Changed
+- `classes/ZeyvroModuleTrait.php`: canon reformateado al estándar oficial PS (llaves, `zvTabIdFromClassName`), sha256 `f51419f3441b7d17e233ba6d8873bfbb32f3a847909d3f748035586077be7d61` (antes `1c0a27c2...`, formato `if/endif`). Validado 9/9 VERDE en el Validator oficial para el módulo hermano `zeyvro_producttabs` (run 3744711).
+- `.php-cs-fixer.dist.php`: config simplificada a la clase oficial `PrestaShop\CodingStandards\CsFixer\Config` con un único override (`blank_line_after_opening_tag => false`); ya no excluye el trait del Finder (el canon nuevo ya está en formato oficial, cs-fixer no lo re-modifica).
+- Sin cambios de comportamiento ni de base de datos. Pendiente de que el Validator oficial confirme 9/9 antes de publicar esta versión.
+
 ## 1.1.5 — 2026-07-04
 
 ### Fixed
