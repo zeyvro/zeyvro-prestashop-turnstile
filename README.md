@@ -1,6 +1,6 @@
 # zeyvro_turnstile — Cloudflare Turnstile Anti-Spam
 
-![Version](https://img.shields.io/badge/version-1.0.8-6C63FF)
+![Version](https://img.shields.io/badge/version-1.1.6-6C63FF)
 ![PrestaShop](https://img.shields.io/badge/PrestaShop-8.0%2B-00D9A3)
 ![PHP](https://img.shields.io/badge/PHP-8.0--8.3-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -116,3 +116,78 @@ Page re-renders with error message to user
 ```
 python C:\Dev\_ecosystem\scripts\build-module-zip.py zeyvro_turnstile --base "C:\Dev\zeyvro\modulos-prestashop"
 ```
+
+---
+
+<!-- ZV-FICHA-MEDIDA:INI -->
+## Ficha técnica — ✅ MEDIDA DEL CÓDIGO 2026-09-03
+
+> Todo lo de esta sección sale de leer el código de la versión **1.1.6** en disco.
+> Fichero principal: `zeyvro_turnstile.php`.
+
+### Qué hace (respaldado por el código)
+
+- Inserta el widget de Cloudflare Turnstile en el formulario de contacto nativo, cargando `https://challenges.cloudflare.com/turnstile/v0/api.js` (linea 155).
+- Valida el token contra `https://challenges.cloudflare.com/turnstile/v0/siteverify` por cURL (lineas 232-252).
+- Si la llamada cURL falla, escribe en `PrestaShopLogger` con severidad 3 (linea 255).
+- Si la validacion no pasa y `ZEYVRO_TURNSTILE_ACTION_ON_FAIL` no es `log_only`, bloquea el envio (linea 218).
+
+### Hooks
+
+| Hook registrado | Método que lo implementa |
+|---|---|
+| `displayHeader` | `hookDisplayHeader()` |
+| `actionFrontControllerSetMedia` | `hookActionFrontControllerSetMedia()` |
+| `displayBeforeBodyClosingTag` | `hookDisplayBeforeBodyClosingTag()` |
+
+### Ajustes de configuración (nombre exacto de la clave)
+
+| Clave `Configuration::` | Para qué |
+|---|---|
+| `ZEYVRO_TURNSTILE_ENABLED` | activa o desactiva la proteccion |
+| `ZEYVRO_TURNSTILE_SITE_KEY` | site key publica de Cloudflare Turnstile |
+| `ZEYVRO_TURNSTILE_SECRET_KEY` | secret key de Cloudflare (server-side) |
+| `ZEYVRO_TURNSTILE_MODE` | modo del widget; **por defecto `managed`** (linea 112) |
+| `ZEYVRO_TURNSTILE_ACTION_ON_FAIL` | que hacer si falla; **por defecto `block`**, alternativa medida `log_only` (lineas 113 y 218) |
+| `ZEYVRO_TURNSTILE_API_TIMEOUT` | timeout de la llamada a Cloudflare |
+| `ZEYVRO_TURNSTILE_LOG_ENABLED` | registrar intentos en el log de PrestaShop |
+| `ZEYVROTURNSTILE_VERSION` | version instalada |
+| `ZEYVROTURNSTILE_TABV` | version de schema de tabs, para la auto-reparacion |
+| `ZEYVRO_PROMO_FEED_CACHE` | cache del feed de cards promocionales Zeyvro (la pone el trait compartido) |
+| `ZEYVRO_PROMO_FEED_TS` | timestamp de ese cache (trait compartido) |
+
+### Compatibilidad, licencia y motor de licencia
+
+| Dato | Valor medido |
+|---|---|
+| `ps_versions_compliancy` | `'min' => '8.0.0', 'max' => '9.99.99'` |
+| Licencia | MIT, fichero `LICENSE` presente |
+| `ZV_LICENSE_TYPE` | `'free'` |
+| `LICENSE_ENABLED` | no declarada |
+| Motor de licencia LemonSqueezy | **No** |
+| `ZeyvroModuleTrait` | `use ZeyvroModuleTrait` - aporta menu padre Zeyvro, tab hijo, auto-reparacion de tabs y cards promocionales |
+| Tab en el menú Zeyvro | `AdminZeyvroTurnstile` - tab 'Anti SPAM' en el menu Zeyvro |
+| `ZV_ADS_VARIANT` | `free` |
+
+### Estructura relevante
+
+- `controllers/admin/AdminZeyvroTurnstileController.php` - pantalla de ajustes
+- `views/templates/front/turnstile_widget.tpl` - widget en el formulario
+- `upgrade/` - 14 scripts, de 1.0.1 a 1.1.4
+
+### Afirmaciones que el código SÍ respalda
+
+> Lista de contraste para auditar contenido de marketing. Si una afirmación no está aquí, el código no la respalda.
+
+- Protege el formulario de contacto de PrestaShop con Cloudflare Turnstile.
+- Verificacion server-side real contra el endpoint `siteverify` de Cloudflare.
+- Modo permisivo disponible: `ACTION_ON_FAIL='log_only'` registra en vez de bloquear.
+- Crea un tab propio 'Anti SPAM' en el menu Zeyvro (`AdminZeyvroTurnstile`).
+- No crea tablas de base de datos.
+- Sin motor de licencia (`ZV_LICENSE_TYPE='free'`).
+
+### No deducible del código
+
+- **Cualquier cifra de spam bloqueado** (por ejemplo '850->70' o '-92%'): el modulo **no cuenta nada**. No hay tabla de log ni contador; solo escribe lineas sueltas en `PrestaShopLogger` si `LOG_ENABLED` esta activo. Ninguna estadistica de eficacia es deducible del codigo.
+- Proteccion de otros formularios (registro, resenas): solo se engancha al de contacto.
+<!-- ZV-FICHA-MEDIDA:FIN -->
