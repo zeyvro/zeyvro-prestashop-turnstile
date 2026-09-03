@@ -129,7 +129,9 @@ python C:\Dev\_ecosystem\scripts\build-module-zip.py zeyvro_turnstile --base "C:
 
 - Inserta el widget de Cloudflare Turnstile en el formulario de contacto nativo, cargando `https://challenges.cloudflare.com/turnstile/v0/api.js` (linea 155).
 - Valida el token contra `https://challenges.cloudflare.com/turnstile/v0/siteverify` por cURL (lineas 232-252).
-- Si la llamada cURL falla, escribe en `PrestaShopLogger` con severidad 3 (linea 255).
+- **Registra cada verificacion en su tabla propia**: `Db::getInstance()->insert('zeyvro_turnstile_log', [...])` en `zeyvro_turnstile.php:280`, guardando ip, user agent, exito/fallo, score y codigos de error.
+- **Cuenta los registros en el backoffice**: `AdminZeyvroTurnstileController::getLogCount()` ejecuta `SELECT COUNT(*) FROM \`_DB_PREFIX_zeyvro_turnstile_log\`` (linea 271), y el controlador lista las filas con `SELECT *` (linea 262) sobre un helper de lista (`$this->table = 'zeyvro_turnstile_log'`, lineas 18 y 242).
+- Si la llamada cURL falla, escribe ademas en `PrestaShopLogger` con severidad 3 (linea 255).
 - Si la validacion no pasa y `ZEYVRO_TURNSTILE_ACTION_ON_FAIL` no es `log_only`, bloquea el envio (linea 218).
 
 ### Hooks
@@ -156,6 +158,11 @@ python C:\Dev\_ecosystem\scripts\build-module-zip.py zeyvro_turnstile --base "C:
 | `ZEYVRO_PROMO_FEED_CACHE` | cache del feed de cards promocionales Zeyvro (la pone el trait compartido) |
 | `ZEYVRO_PROMO_FEED_TS` | timestamp de ese cache (trait compartido) |
 
+### Tablas de base de datos
+
+- `**`zeyvro_turnstile_log`** - tabla PROPIA del modulo. Columnas medidas en `sql/install.sql`: `id_log` (PK autoinc), `ip` VARCHAR(45), `user_agent` VARCHAR(255), `date_add` DATETIME, `success` TINYINT(1), `score` DECIMAL(4,2), `error_codes` TEXT, con indice `idx_date` sobre `date_add`.`
+- `Se crea en DOS sitios: `sql/install.sql` y el propio `zeyvro_turnstile.php:92`. Se borra en `sql/uninstall.sql` (`DROP TABLE IF EXISTS`).`
+
 ### Compatibilidad, licencia y motor de licencia
 
 | Dato | Valor medido |
@@ -171,8 +178,10 @@ python C:\Dev\_ecosystem\scripts\build-module-zip.py zeyvro_turnstile --base "C:
 
 ### Estructura relevante
 
-- `controllers/admin/AdminZeyvroTurnstileController.php` - pantalla de ajustes
+- `sql/install.sql` + `sql/uninstall.sql` - creacion y borrado de la tabla de log
+- `controllers/admin/AdminZeyvroTurnstileController.php` - ajustes **y listado del log**
 - `views/templates/front/turnstile_widget.tpl` - widget en el formulario
+- `vendor/` - dependencias composer embarcadas
 - `upgrade/` - 14 scripts, de 1.0.1 a 1.1.4
 
 ### Afirmaciones que el código SÍ respalda
@@ -181,13 +190,14 @@ python C:\Dev\_ecosystem\scripts\build-module-zip.py zeyvro_turnstile --base "C:
 
 - Protege el formulario de contacto de PrestaShop con Cloudflare Turnstile.
 - Verificacion server-side real contra el endpoint `siteverify` de Cloudflare.
+- **Registra los bloqueos en su propia tabla `zeyvro_turnstile_log` y los cuenta en el backoffice** (`getLogCount()`).
+- Guarda por intento: ip, user agent, fecha, exito/fallo, score y codigos de error de Cloudflare.
 - Modo permisivo disponible: `ACTION_ON_FAIL='log_only'` registra en vez de bloquear.
 - Crea un tab propio 'Anti SPAM' en el menu Zeyvro (`AdminZeyvroTurnstile`).
-- No crea tablas de base de datos.
 - Sin motor de licencia (`ZV_LICENSE_TYPE='free'`).
 
 ### No deducible del código
 
-- **Cualquier cifra de spam bloqueado** (por ejemplo '850->70' o '-92%'): el modulo **no cuenta nada**. No hay tabla de log ni contador; solo escribe lineas sueltas en `PrestaShopLogger` si `LOG_ENABLED` esta activo. Ninguna estadistica de eficacia es deducible del codigo.
+- **Una cifra concreta de eficacia (por ejemplo '850 -> 70' o '-92%') requiere aportar la consulta sobre una instalacion real.** El codigo da el mecanismo -- tabla de log con `success` y contador en el BO -- pero no una cifra: no esta respaldada por el codigo en abstracto, y tampoco es imposible de respaldar. Para sostenerla hace falta el `SELECT` sobre la tienda concreta y la fecha del corte.
 - Proteccion de otros formularios (registro, resenas): solo se engancha al de contacto.
 <!-- ZV-FICHA-MEDIDA:FIN -->
