@@ -160,8 +160,8 @@ python C:\Dev\_ecosystem\scripts\build-module-zip.py zeyvro_turnstile --base "C:
 
 ### Tablas de base de datos
 
-- `**`zeyvro_turnstile_log`** - tabla PROPIA del modulo. Columnas medidas en `sql/install.sql`: `id_log` (PK autoinc), `ip` VARCHAR(45), `user_agent` VARCHAR(255), `date_add` DATETIME, `success` TINYINT(1), `score` DECIMAL(4,2), `error_codes` TEXT, con indice `idx_date` sobre `date_add`.`
-- `Se crea en DOS sitios: `sql/install.sql` y el propio `zeyvro_turnstile.php:92`. Se borra en `sql/uninstall.sql` (`DROP TABLE IF EXISTS`).`
+- **`zeyvro_turnstile_log`** - tabla PROPIA del modulo. Columnas medidas en `sql/install.sql`: `id_log` (PK autoinc), `ip` VARCHAR(45), `user_agent` VARCHAR(255), `date_add` DATETIME, `success` TINYINT(1), `score` DECIMAL(4,2), `error_codes` TEXT, con indice `idx_date` sobre `date_add`.
+- Se crea en DOS sitios: `sql/install.sql` y el propio `zeyvro_turnstile.php:92`. Se borra en `sql/uninstall.sql` (`DROP TABLE IF EXISTS`).
 
 ### Compatibilidad, licencia y motor de licencia
 
