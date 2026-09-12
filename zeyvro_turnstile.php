@@ -40,7 +40,7 @@ class Zeyvro_Turnstile extends Module
     {
         $this->name = 'zeyvro_turnstile';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.6';
+        $this->version = '1.1.7';
         $this->author = 'Zeyvro';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => '9.99.99'];
@@ -293,6 +293,14 @@ class Zeyvro_Turnstile extends Module
 
     private function runAutoUpgrade(): void
     {
+        // v1.1.7 — En la gestión de módulos del BO (subir el ZIP, «Actualizar»…) el core ya ejecuta él mismo los
+        // upgrade/*.php. Adelantarlos aquí hace que PS 9.1 los vea duplicados (Module::runUpgradeModule) y responda
+        // status=false aunque la actualización se haya hecho. En el resto de peticiones del BO sigue igual: PS 9.0.0
+        // no aplica los upgrade/*.php al subir el ZIP y es esto lo que lo cubre.
+        if (self::isModuleManagerRequest()) {
+            return;
+        }
+
         try {
             $installed = (string) Configuration::get('ZEYVROTURNSTILE_VERSION');
             if (!$installed || !preg_match('/^\d+\.\d+\.\d+$/', $installed)) {
@@ -357,5 +365,17 @@ class Zeyvro_Turnstile extends Module
                 3, null, 'zeyvro_turnstile', 0, true
             );
         }
+    }
+
+    /**
+     * true = la petición actual es la gestión de módulos del BO (rutas Symfony /improve/modules/…:
+     * admin_module_import, admin_module_manage_action, admin_module_manage_update_all…), donde
+     * ModuleManager ya ejecuta los upgrade/*.php.
+     */
+    private static function isModuleManagerRequest(): bool
+    {
+        $uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+
+        return strpos($uri, '/improve/modules/') !== false;
     }
 }

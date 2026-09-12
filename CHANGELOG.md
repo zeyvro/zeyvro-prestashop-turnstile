@@ -5,6 +5,20 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ---
 
+## 1.1.7 — 2026-09-12
+
+### Corregido (ES)
+- **Aviso falso al actualizar desde el BO en PrestaShop 9.1.** Al subir el ZIP de una versión nueva, PS 9.1 puede responder «No se han hecho actualizaciones… El módulo zeyvro_turnstile no se puede actualizar ahora mismo» aunque la actualización sí se haya hecho (base de datos y código en la versión nueva). Causa: el auto-upgrade del módulo (`runAutoUpgrade()`, en el constructor) ejecutaba los `upgrade/*.php` dentro de la misma petición en la que PS 9.1 los vuelve a ejecutar; el core los ve ya cargados, los marca como duplicados (`classes/module/Module.php`, `runUpgradeModule()`) y devuelve error.
+- `runAutoUpgrade()` ya no hace nada en las peticiones de gestión de módulos del BO (rutas `/improve/modules/…`: subir el ZIP, «Actualizar»), donde PrestaShop ejecuta él mismo los scripts. En el resto de páginas del BO sigue funcionando igual: PS 9.0.0 no aplica los scripts al subir el ZIP y es el auto-upgrade el que lo cubre.
+- `upgrade/upgrade-1.1.7.php`: sin cambios de esquema. Invalida en OPcache solo los ficheros `.php` del módulo (nunca la caché de toda la tienda) y limpia la caché del módulo. Idempotente.
+- **Al actualizar a esta versión desde una anterior**, PrestaShop 9.1 todavía puede mostrar ese aviso: en esa subida el servidor ejecuta aún el código de la versión que tenías instalada. **La actualización se ha realizado.** Desde la 1.1.7, las siguientes actualizaciones ya no lo muestran.
+
+### Fixed (EN)
+- **False warning when upgrading from the Back Office on PrestaShop 9.1.** When uploading the ZIP of a new version, PS 9.1 may answer "No update has been applied… Module zeyvro_turnstile cannot be updated this time" even though the upgrade has been applied (database and code on the new version). Cause: the module's auto-upgrade (`runAutoUpgrade()`, in the constructor) ran the `upgrade/*.php` scripts inside the same request in which PS 9.1 runs them again; the core finds them already loaded, flags them as duplicates (`classes/module/Module.php`, `runUpgradeModule()`) and returns an error.
+- `runAutoUpgrade()` now does nothing on Back Office module-management requests (`/improve/modules/…` routes: ZIP upload, "Upgrade"), where PrestaShop runs the scripts itself. It keeps working on every other Back Office page: PS 9.0.0 does not apply the scripts when the ZIP is uploaded and the auto-upgrade covers that.
+- `upgrade/upgrade-1.1.7.php`: no schema change. It invalidates only the module's own `.php` files in OPcache (never the whole shop's cache) and clears the module cache. Idempotent.
+- **When upgrading to this version from an older one**, PrestaShop 9.1 may still show that warning: during that upload the server still runs the code of the version you had installed. **The upgrade has been applied.** From 1.1.7 on, later upgrades no longer show it.
+
 ## 1.1.6 — 2026-07-06
 
 ### Changed
