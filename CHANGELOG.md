@@ -5,6 +5,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ---
 
+## 1.1.8 — 2026-09-23
+
+### Corregido (ES)
+- **PrestaShop 8.0 y 8.1: un mensaje rechazado por Turnstile ya no se guarda en Servicio al cliente.** Con la acción «Bloquear», el cliente veía el aviso de error y el correo no salía, pero el mensaje quedaba guardado igualmente en **Clientes → Servicio al cliente**. Pasaba con el módulo de contacto de PrestaShop anterior a la 4.4.3, el que traen PS 8.0 y 8.1. Ahora un envío rechazado no llega a procesarse: el cliente ve el aviso y conserva en el formulario su email y el texto que había escrito, para volver a intentarlo.
+- En PrestaShop 8.2 y 9 no cambia nada para la tienda: ahí el mensaje rechazado ya no se guardaba.
+- `upgrade/upgrade-1.1.8.php`: sin cambios en la base de datos; limpia la caché del módulo. Idempotente.
+- **Aviso conocido — si actualizas desde la 1.1.6 en PrestaShop 9.1:** en algunos alojamientos puede aparecer un aviso de error al subir el ZIP. Recarga la página: la actualización ya está hecha.
+- Desde la 1.1.7, la actualización a la 1.1.8 en PrestaShop 9.1 ya no muestra ese aviso.
+
+### Fixed (EN)
+- **PrestaShop 8.0 and 8.1: a message rejected by Turnstile is no longer saved in Customer Service.** With the "Block" action, the customer saw the error and no email was sent, but the message was still saved in **Customers → Customer Service**. It happened with the PrestaShop contact module older than 4.4.3, the one shipped with PS 8.0 and 8.1. A rejected submission is now never processed: the customer sees the error and keeps their email and the text they wrote in the form, so they can try again.
+- Nothing changes for the shop on PrestaShop 8.2 and 9: there the rejected message was already not saved.
+- `upgrade/upgrade-1.1.8.php`: no database change; clears the module cache. Idempotent.
+- **Known notice — if you upgrade from 1.1.6 on PrestaShop 9.1:** on some hosting setups an error notice may appear when you upload the ZIP. Reload the page: the upgrade is already done.
+- From 1.1.7 on, upgrading to 1.1.8 on PrestaShop 9.1 no longer shows that notice.
+
 ## 1.1.7 — 2026-09-12
 
 ### Corregido (ES)

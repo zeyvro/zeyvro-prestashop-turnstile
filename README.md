@@ -29,6 +29,8 @@ Protects the native PrestaShop 8 contact form (`/contact-us`) against spam using
 3. Go to **CUSTOMIZE → Zeyvro → Anti SPAM** and paste your Site Key and Secret Key.
 4. Enable the module and save.
 
+> **Upgrading from 1.1.6 on PrestaShop 9.1:** if an error notice appears when you upload the ZIP, reload the page: the upgrade is already done.
+
 ### Setup: get Cloudflare keys
 1. Log in to [dash.cloudflare.com](https://dash.cloudflare.com).
 2. Go to **Turnstile → Add site**.
@@ -65,6 +67,8 @@ Protege el formulario de contacto nativo de PrestaShop 8 (`/contact-us`) contra 
 2. El módulo se instala y actualiza solo — sin pasos manuales.
 3. Ve a **PERSONALIZAR → Zeyvro → Anti SPAM** y pega tu Site Key y Secret Key.
 4. Activa el módulo y guarda.
+
+> **Si actualizas desde la 1.1.6 en PrestaShop 9.1:** si aparece un aviso de error al actualizar, recarga la página: la actualización ya está hecha.
 
 ### Configurar las claves de Cloudflare
 1. Accede a [dash.cloudflare.com](https://dash.cloudflare.com).
