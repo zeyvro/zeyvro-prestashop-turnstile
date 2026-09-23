@@ -40,7 +40,7 @@ class Zeyvro_Turnstile extends Module
     {
         $this->name = 'zeyvro_turnstile';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.7';
+        $this->version = '1.1.8';
         $this->author = 'Zeyvro';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => '9.99.99'];
@@ -219,6 +219,11 @@ class Zeyvro_Turnstile extends Module
             $this->context->controller->errors[] = $this->l(
                 'Security verification failed. Please try again.'
             );
+            // v1.1.8 — contactform < 4.4.3 (PS 8.0 / 8.1) guarda el mensaje en Servicio al cliente sin mirar
+            // controller->errors. Sin submitMessage no entra en sendMessage(); el email y el mensaje se conservan.
+            foreach (['submitMessage', 'submitMessage_x', 'submitMessage_y'] as $key) {
+                unset($_POST[$key], $_GET[$key]);
+            }
         }
     }
 
