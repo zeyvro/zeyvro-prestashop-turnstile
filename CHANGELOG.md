@@ -5,6 +5,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ---
 
+## 1.1.10 — 2026-09-24
+
+### Cambiado (ES)
+- **Código de actualización al día con PrestaShop.** Los scripts de actualización de las versiones 1.0.3 y 1.0.7 buscaban el menú del panel con una función que PrestaShop marca como obsoleta desde la 1.7.1. Ahora lo buscan directamente en la base de datos, como el resto del módulo. El resultado es el mismo.
+- Sin cambios de funcionamiento ni en la base de datos.
+- `upgrade/upgrade-1.1.10.php`: sin cambios en la base de datos; limpia la caché del módulo. Idempotente.
+
+### Changed (EN)
+- **Upgrade code up to date with PrestaShop.** The upgrade scripts of versions 1.0.3 and 1.0.7 looked up the back-office menu with a function PrestaShop has marked as deprecated since 1.7.1. They now look it up directly in the database, like the rest of the module. The result is the same.
+- No change in behaviour or in the database.
+- `upgrade/upgrade-1.1.10.php`: no database change; clears the module cache. Idempotent.
+
 ## 1.1.9 — 2026-09-24
 
 ### Cambiado (ES)

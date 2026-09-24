@@ -1,6 +1,6 @@
 # zeyvro_turnstile — Cloudflare Turnstile Anti-Spam
 
-![Version](https://img.shields.io/badge/version-1.1.9-6C63FF)
+![Version](https://img.shields.io/badge/version-1.1.10-6C63FF)
 ![PrestaShop](https://img.shields.io/badge/PrestaShop-8.0%2B-00D9A3)
 ![PHP](https://img.shields.io/badge/PHP-8.0--8.3-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)

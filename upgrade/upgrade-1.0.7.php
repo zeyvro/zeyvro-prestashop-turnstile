@@ -23,9 +23,9 @@ function upgrade_module_1_0_7(Module $module): bool
         $db = Db::getInstance();
 
         // -- 1. Determinar id_parent correcto: IMPROVE -> AdminParentModulesSf
-        $id_improve = (int) Tab::getIdFromClassName('IMPROVE');
+        $id_improve = _upgrade107TabId('IMPROVE');
         $id_target_parent = $id_improve
-            ?: (int) Tab::getIdFromClassName('AdminParentModulesSf');
+            ?: _upgrade107TabId('AdminParentModulesSf');
 
         if (!$id_target_parent) {
             PrestaShopLogger::addLog(
@@ -90,7 +90,7 @@ function upgrade_module_1_0_7(Module $module): bool
         }
 
         // -- 3. Eliminar AdminZeyvroGroup si existe
-        $id_group = (int) Tab::getIdFromClassName('AdminZeyvroGroup');
+        $id_group = _upgrade107TabId('AdminZeyvroGroup');
         if ($id_group) {
             // Reparentar hijos al AdminZeyvroParent canonico antes de borrar
             $db->execute(
@@ -102,7 +102,7 @@ function upgrade_module_1_0_7(Module $module): bool
         }
 
         // -- 4. Reparar/crear AdminZeyvroTurnstile
-        $id_child = (int) Tab::getIdFromClassName('AdminZeyvroTurnstile');
+        $id_child = _upgrade107TabId('AdminZeyvroTurnstile');
         if ($id_child) {
             // Ya existe: asegurar id_parent correcto y nombre "Anti SPAM"
             $tab = new Tab($id_child);
@@ -146,6 +146,17 @@ function upgrade_module_1_0_7(Module $module): bool
 
         return true; // nunca WSOD — el boton Actualizar nativo queda como fallback
     }
+}
+
+/**
+ * id_tab por class_name, 0 si no existe (como ZeyvroModuleTrait::zvTabIdFromClassName; sin
+ * el método estático de Tab que busca por class_name, deprecado desde PrestaShop 1.7.1.0).
+ */
+function _upgrade107TabId(string $class_name): int
+{
+    return (int) Db::getInstance()->getValue(
+        'SELECT `id_tab` FROM `' . _DB_PREFIX_ . 'tab` WHERE `class_name` = "' . pSQL($class_name) . '"'
+    );
 }
 
 function _upgrade107CreateTabRoles(string $class_name, $db): void
