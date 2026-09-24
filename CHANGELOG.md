@@ -5,6 +5,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ---
 
+## 1.1.9 — 2026-09-24
+
+### Cambiado (ES)
+- **Compatibilidad declarada: PrestaShop 8.0.0 – 9.1.3.** El módulo ya no se declara compatible con versiones de PrestaShop que aún no existen (antes: hasta 9.99.99). 9.1.3 es la última versión en la que se ha probado entero, en 7 combinaciones de PrestaShop y PHP. Cuando salga una versión nueva de PrestaShop, se probará y se ampliará.
+- Sin cambios de funcionamiento ni en la base de datos.
+- `upgrade/upgrade-1.1.9.php`: sin cambios en la base de datos; limpia la caché del módulo. Idempotente.
+
+### Changed (EN)
+- **Declared compatibility: PrestaShop 8.0.0 – 9.1.3.** The module no longer declares itself compatible with PrestaShop versions that do not exist yet (before: up to 9.99.99). 9.1.3 is the latest version it has been fully tested on, across 7 PrestaShop and PHP combinations. When a new PrestaShop version is released, it will be tested and the range extended.
+- No change in behaviour or in the database.
+- `upgrade/upgrade-1.1.9.php`: no database change; clears the module cache. Idempotent.
+
 ## 1.1.8 — 2026-09-23
 
 ### Corregido (ES)

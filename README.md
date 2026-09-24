@@ -1,6 +1,6 @@
 # zeyvro_turnstile — Cloudflare Turnstile Anti-Spam
 
-![Version](https://img.shields.io/badge/version-1.1.6-6C63FF)
+![Version](https://img.shields.io/badge/version-1.1.9-6C63FF)
 ![PrestaShop](https://img.shields.io/badge/PrestaShop-8.0%2B-00D9A3)
 ![PHP](https://img.shields.io/badge/PHP-8.0--8.3-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -127,6 +127,7 @@ python C:\Dev\_ecosystem\scripts\build-module-zip.py zeyvro_turnstile --base "C:
 ## Ficha técnica — ✅ MEDIDA DEL CÓDIGO 2026-09-03
 
 > Todo lo de esta sección sale de leer el código de la versión **1.1.6** en disco.
+> Excepción: la fila `ps_versions_compliancy` se actualizó en la **1.1.9** (2026-09-24).
 > Fichero principal: `zeyvro_turnstile.php`.
 
 ### Qué hace (respaldado por el código)
@@ -171,7 +172,7 @@ python C:\Dev\_ecosystem\scripts\build-module-zip.py zeyvro_turnstile --base "C:
 
 | Dato | Valor medido |
 |---|---|
-| `ps_versions_compliancy` | `'min' => '8.0.0', 'max' => '9.99.99'` |
+| `ps_versions_compliancy` | `'min' => '8.0.0', 'max' => '9.1.3'` |
 | Licencia | MIT, fichero `LICENSE` presente |
 | `ZV_LICENSE_TYPE` | `'free'` |
 | `LICENSE_ENABLED` | no declarada |
