@@ -204,6 +204,7 @@ class Zeyvro_Turnstile extends Module
             // En todas las páginas: la ventana de login de los temas envía a la página de login nativa
             'login' => !$this->context->customer->isLogged() && $this->isFormOn('login'),
             'password' => $phpSelf === 'password' && $this->isFormOn('password'),
+            'prestablog' => $this->currentModuleName() === 'prestablog' && $this->isFormOn('prestablog'),
         ];
         if (!in_array(true, $forms, true)) {
             return '';
@@ -233,6 +234,10 @@ class Zeyvro_Turnstile extends Module
      */
     public function hookActionFrontControllerSetMedia($params): void
     {
+        // v1.2.0 — mensajes de los envíos rechazados en actionDispatcher (aquí el idioma ya está resuelto)
+        if (!empty(self::$sbtFailed['prestablog'])) {
+            $this->context->controller->errors[] = $this->l('Security verification failed. Please try again.');
+        }
         if (!(int) Configuration::get('ZEYVRO_TURNSTILE_ENABLED')) {
             return;
         }
@@ -373,6 +378,9 @@ class Zeyvro_Turnstile extends Module
             // Solo la petición del enlace; el formulario de la nueva contraseña (token + passwd) no se toca
             $form = 'password';
             $keys = ['email'];
+        } elseif ($this->currentModuleName() === 'prestablog' && Tools::isSubmit('submitComment')) {
+            $form = 'prestablog';
+            $keys = ['submitComment', 'submitComment_x', 'submitComment_y'];
         }
         if ($form === null || !$this->isFormOn($form) || $this->verifyFormToken($form)) {
             return;

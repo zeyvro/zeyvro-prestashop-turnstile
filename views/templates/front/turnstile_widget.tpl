@@ -183,6 +183,10 @@
                 addWidget(form, submitButton(form), 'password', false);
                 return;
             }
+            if (on('prestablog') && form.querySelector('[name="submitComment"]')) {
+                addWidget(form, form.querySelector('[name="submitComment"]'), 'prestablog', false);
+                return;
+            }
             // (formularios v1.2.0)
         });
         // (fuera de un <form>, v1.2.0)
