@@ -34,13 +34,31 @@ class Zeyvro_Turnstile extends Module
         'ZEYVRO_TURNSTILE_ACTION_ON_FAIL',
         'ZEYVRO_TURNSTILE_LOG_ENABLED',
         'ZEYVRO_TURNSTILE_API_TIMEOUT',
+        'ZEYVRO_TURNSTILE_FORM_REGISTER',
+        'ZEYVRO_TURNSTILE_FORM_LOGIN',
+        'ZEYVRO_TURNSTILE_FORM_PASSWORD',
+        'ZEYVRO_TURNSTILE_FORM_PRESTABLOG',
+        'ZEYVRO_TURNSTILE_FORM_EMAILALERTS',
     ];
+
+    // v1.2.0 — un interruptor por formulario. ZEYVRO_TURNSTILE_ENABLED sigue siendo el general y el contacto
+    // no tiene interruptor propio: se comporta como en la 1.1.10.
+    public const FORM_KEYS = [
+        'register' => 'ZEYVRO_TURNSTILE_FORM_REGISTER',
+        'login' => 'ZEYVRO_TURNSTILE_FORM_LOGIN',
+        'password' => 'ZEYVRO_TURNSTILE_FORM_PASSWORD',
+        'prestablog' => 'ZEYVRO_TURNSTILE_FORM_PRESTABLOG',
+        'emailalerts' => 'ZEYVRO_TURNSTILE_FORM_EMAILALERTS',
+    ];
+
+    /** @var array<string, bool> formularios cuya verificación ha fallado en esta petición */
+    private static $sbtFailed = [];
 
     public function __construct()
     {
         $this->name = 'zeyvro_turnstile';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.10';
+        $this->version = '1.2.0';
         $this->author = 'Zeyvro';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => '9.1.3'];
@@ -50,7 +68,7 @@ class Zeyvro_Turnstile extends Module
 
         $this->displayName = $this->l('Zeyvro Turnstile');
         $this->description = $this->l(
-            'Anti-spam protection with Cloudflare Turnstile on the PrestaShop contact form.'
+            'Anti-spam protection with Cloudflare Turnstile on the contact, registration, login and password recovery forms, blog comments and back-in-stock alerts.'
         );
 
         // §7.1 — Auto-upgrade al subir ZIP por BO
@@ -71,7 +89,9 @@ class Zeyvro_Turnstile extends Module
             && $this->installConfig()
             && $this->registerHook('displayHeader')
             && $this->registerHook('displayBeforeBodyClosingTag')
-            && $this->registerHook('actionFrontControllerSetMedia');
+            && $this->registerHook('actionFrontControllerSetMedia')
+            && $this->registerHook('actionDispatcher')
+            && $this->registerHook('actionSubmitAccountBefore');
     }
 
     public function uninstall(): bool
@@ -82,6 +102,8 @@ class Zeyvro_Turnstile extends Module
         $this->unregisterHook('displayHeader');
         $this->unregisterHook('displayBeforeBodyClosingTag');
         $this->unregisterHook('actionFrontControllerSetMedia');
+        $this->unregisterHook('actionDispatcher');
+        $this->unregisterHook('actionSubmitAccountBefore');
 
         return parent::uninstall();
     }
@@ -113,6 +135,12 @@ class Zeyvro_Turnstile extends Module
             'ZEYVRO_TURNSTILE_ACTION_ON_FAIL' => 'block',
             'ZEYVRO_TURNSTILE_LOG_ENABLED' => 1,
             'ZEYVRO_TURNSTILE_API_TIMEOUT' => 5,
+            // v1.2.0 — encendidos en instalación limpia; upgrade-1.2.0.php los crea apagados
+            'ZEYVRO_TURNSTILE_FORM_REGISTER' => 1,
+            'ZEYVRO_TURNSTILE_FORM_LOGIN' => 1,
+            'ZEYVRO_TURNSTILE_FORM_PASSWORD' => 1,
+            'ZEYVRO_TURNSTILE_FORM_PRESTABLOG' => 1,
+            'ZEYVRO_TURNSTILE_FORM_EMAILALERTS' => 1,
         ];
         foreach ($defaults as $k => $v) {
             Configuration::updateValue($k, $v);
@@ -160,7 +188,7 @@ class Zeyvro_Turnstile extends Module
     }
 
     /**
-     * Inyecta el widget Turnstile en el formulario de contacto vía JS.
+     * Inyecta el widget Turnstile vía JS en los formularios protegidos de la página (contacto como en la 1.1.10).
      */
     public function hookDisplayBeforeBodyClosingTag($params): string
     {
@@ -170,7 +198,16 @@ class Zeyvro_Turnstile extends Module
         $phpSelf = isset($this->context->controller->php_self)
             ? $this->context->controller->php_self
             : null;
-        if ($phpSelf !== 'contact') {
+        $forms = [
+            'contact' => $phpSelf === 'contact',
+            'register' => $phpSelf === 'registration' && $this->isFormOn('register'),
+            // En todas las páginas: la ventana de login de los temas envía a la página de login nativa
+            'login' => !$this->context->customer->isLogged() && $this->isFormOn('login'),
+            'password' => $phpSelf === 'password' && $this->isFormOn('password'),
+            'prestablog' => $this->currentModuleName() === 'prestablog' && $this->isFormOn('prestablog'),
+            'emailalerts' => $phpSelf === 'product' && $this->isFormOn('emailalerts'),
+        ];
+        if (!in_array(true, $forms, true)) {
             return '';
         }
         $siteKey = Configuration::get('ZEYVRO_TURNSTILE_SITE_KEY');
@@ -182,6 +219,12 @@ class Zeyvro_Turnstile extends Module
         $this->context->smarty->assign([
             'sbt_site_key' => $siteKey,
             'sbt_mode' => $mode,
+            'sbt_forms' => $forms,
+            'sbt_page' => (string) $phpSelf,
+            'sbt_auth_url' => $this->context->link->getPageLink('authentication', true),
+            // prestablog no: su mensaje va en el bloque de notificaciones de la página (controller->errors)
+            'sbt_failed' => implode(',', array_diff(array_keys(self::$sbtFailed), ['prestablog'])),
+            'sbt_error' => $this->l('Security verification failed. Please try again.'),
         ]);
 
         return $this->display(__FILE__, 'views/templates/front/turnstile_widget.tpl');
@@ -192,6 +235,17 @@ class Zeyvro_Turnstile extends Module
      */
     public function hookActionFrontControllerSetMedia($params): void
     {
+        // v1.2.0 — mensajes de los envíos rechazados en actionDispatcher (aquí el idioma ya está resuelto)
+        if (!empty(self::$sbtFailed['prestablog'])) {
+            $this->context->controller->errors[] = $this->l('Security verification failed. Please try again.');
+        }
+        if (!empty(self::$sbtFailed['emailalerts'])) {
+            // Mismo contrato que ps_emailalerts/controllers/front/actions.php: su JS hace JSON.parse de la respuesta
+            exit(json_encode([
+                'error' => true,
+                'message' => $this->l('Security verification failed. Please try again.'),
+            ]));
+        }
         if (!(int) Configuration::get('ZEYVRO_TURNSTILE_ENABLED')) {
             return;
         }
@@ -224,6 +278,125 @@ class Zeyvro_Turnstile extends Module
             foreach (['submitMessage', 'submitMessage_x', 'submitMessage_y'] as $key) {
                 unset($_POST[$key], $_GET[$key]);
             }
+        }
+    }
+
+    /* =====================================================================
+     * v1.2.0 — REGISTRO, LOGIN, CONTRASEÑA, PRESTABLOG Y PS_EMAILALERTS
+     * =================================================================== */
+
+    /**
+     * true = el formulario está protegido: interruptor general + el suyo y, para prestablog y ps_emailalerts,
+     * el módulo instalado y activo.
+     */
+    private function isFormOn(string $form): bool
+    {
+        if (!isset(self::FORM_KEYS[$form])
+            || !(int) Configuration::get('ZEYVRO_TURNSTILE_ENABLED')
+            || !(int) Configuration::get(self::FORM_KEYS[$form])) {
+            return false;
+        }
+        $modules = ['prestablog' => 'prestablog', 'emailalerts' => 'ps_emailalerts'];
+        if (!isset($modules[$form])) {
+            return true;
+        }
+
+        return Module::isInstalled($modules[$form]) && Module::isEnabled($modules[$form]);
+    }
+
+    /**
+     * Nombre del módulo dueño del controlador de front actual ('' si no es un controlador de módulo).
+     */
+    private function currentModuleName(): string
+    {
+        $controller = $this->context->controller;
+        if ($controller instanceof ModuleFrontController && $controller->module instanceof Module) {
+            return (string) $controller->module->name;
+        }
+
+        return '';
+    }
+
+    /**
+     * Verifica el token con el mismo log y el mismo ACTION_ON_FAIL que el contacto.
+     * true = se deja pasar (token válido, sin clave secreta o modo «solo registrar»); false = hay que rechazarlo.
+     */
+    private function verifyFormToken(string $form): bool
+    {
+        $secretKey = Configuration::get('ZEYVRO_TURNSTILE_SECRET_KEY');
+        if (empty($secretKey)) {
+            return true;
+        }
+        $token = (string) Tools::getValue('cf-turnstile-response', '');
+        $remoteIp = Tools::getRemoteAddr();
+        $result = $this->verifyCloudflareTurnstile($secretKey, $token, $remoteIp);
+
+        $this->logVerification($remoteIp, $result);
+
+        if ($result['success'] || Configuration::get('ZEYVRO_TURNSTILE_ACTION_ON_FAIL') === 'log_only') {
+            return true;
+        }
+        self::$sbtFailed[$form] = true;
+
+        return false;
+    }
+
+    /**
+     * v1.2.0 — Registro. El núcleo ejecuta este hook en RegistrationController::initContent() justo antes de
+     * $register_form->submit() y devolver false impide crear la cuenta (corre también con ajax=1).
+     * Desde 8.2 el checkout también lo ejecuta (CheckoutPersonalInformationStep): ahí no se toca, el checkout
+     * de invitado queda fuera de esta versión.
+     */
+    public function hookActionSubmitAccountBefore($params): bool
+    {
+        if (!isset($this->context->controller->php_self)
+            || $this->context->controller->php_self !== 'registration'
+            || !$this->isFormOn('register')) {
+            return true;
+        }
+
+        return $this->verifyFormToken('register');
+    }
+
+    /**
+     * v1.2.0 — Verificación en el servidor del login, recuperar contraseña, comentarios de prestablog y avisos
+     * de ps_emailalerts. Va en actionDispatcher (justo antes de Controller::run()) y no en
+     * actionFrontControllerSetMedia: con ajax=1 o Accept: application/json, FrontController::init() pone
+     * display_header=false, el núcleo no llama a setMedia() y el envío pasaría sin verificar.
+     * Si falla, se quita del envío la clave que mira el controlador; el mensaje se pinta después, con el idioma
+     * ya resuelto (plantilla del widget, o actionFrontControllerSetMedia para prestablog y ps_emailalerts).
+     */
+    public function hookActionDispatcher($params): void
+    {
+        if (!(int) Configuration::get('ZEYVRO_TURNSTILE_ENABLED')) {
+            return;
+        }
+        $type = isset($params['controller_type']) ? (int) $params['controller_type'] : 0;
+        if ($type !== Dispatcher::FC_FRONT && $type !== Dispatcher::FC_MODULE) {
+            return;
+        }
+        $phpSelf = isset($this->context->controller->php_self) ? (string) $this->context->controller->php_self : '';
+        $form = null;
+        $keys = [];
+        if ($phpSelf === 'authentication' && Tools::isSubmit('submitLogin')) {
+            $form = 'login';
+            $keys = ['submitLogin', 'submitLogin_x', 'submitLogin_y'];
+        } elseif ($phpSelf === 'password' && Tools::isSubmit('email')) {
+            // Solo la petición del enlace; el formulario de la nueva contraseña (token + passwd) no se toca
+            $form = 'password';
+            $keys = ['email'];
+        } elseif ($this->currentModuleName() === 'prestablog' && Tools::isSubmit('submitComment')) {
+            $form = 'prestablog';
+            $keys = ['submitComment', 'submitComment_x', 'submitComment_y'];
+        } elseif ($this->currentModuleName() === 'ps_emailalerts' && Tools::getValue('process') === 'add') {
+            $form = 'emailalerts';
+            $keys = ['process'];
+        }
+        if ($form === null || !$this->isFormOn($form) || $this->verifyFormToken($form)) {
+            return;
+        }
+        foreach ($keys as $key) {
+            unset($_POST[$key], $_GET[$key]);
         }
     }
 

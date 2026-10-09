@@ -13,7 +13,7 @@ global $_MODULE;
 $_MODULE = [];
 
 $_MODULE['<{zeyvro_turnstile}prestashop>zeyvro_turnstile_5527b6b01dcf35691545691a8a79e27c'] = 'Zeyvro Turnstile';
-$_MODULE['<{zeyvro_turnstile}prestashop>zeyvro_turnstile_c1fef78503f22ff160104319a0e62f49'] = 'Anti-spam protection with Cloudflare Turnstile on the PrestaShop contact form.';
+$_MODULE['<{zeyvro_turnstile}prestashop>zeyvro_turnstile_1626bc9ab73742f2e9d129bf06488d67'] = 'Anti-spam protection with Cloudflare Turnstile on the contact, registration, login and password recovery forms, blog comments and back-in-stock alerts.';
 $_MODULE['<{zeyvro_turnstile}prestashop>zeyvro_turnstile_4827ecb3ad37d0623827e275419c288f'] = 'Security verification failed. Please try again.';
 $_MODULE['<{zeyvro_turnstile}prestashop>zeyvro_turnstile_f4b30c2fe83dab2f1db5ce70f7253749'] = 'Verification log (last 50)';
 $_MODULE['<{zeyvro_turnstile}prestashop>zeyvro_turnstile_44749712dbec183e983dcd78a7736c41'] = 'Date';
@@ -52,3 +52,11 @@ $_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_65b51da33
 $_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_fd4910c89b092bf6215e4a7ce2d89083'] = 'Maximum wait time for the Cloudflare API call. Default: 5.';
 $_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_fb8e7b410a98236f1b530282166babcf'] = 'Turnstile Configuration';
 $_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_c9cc8cce247e49bae79f15173ce97354'] = 'Save';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_bbf34ed6c83f4fc9ec29ab2339fad012'] = 'Protect registration form';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_2c85c39a6426f128d999fe418e870b95'] = 'Account creation inside the checkout is not covered.';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_0cc55a94a6686b831c76b6467dad2d48'] = 'Protect login form';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_6696a302296be9642ff7e3b1e9f1e7b9'] = 'Also covers the login window of themes that send it to the native login page.';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_82e614267ca0cf8db60ad0fcd6d3161c'] = 'Protect password recovery form';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_35c5dd69680a3f8a05b5d0e83a394a68'] = 'Protect blog comments (prestablog)';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_531072ee100837c72c92a2a29e376693'] = 'Protect back-in-stock alerts (ps_emailalerts)';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_62fa42c57273d2aaab44a3924ffe7c2a'] = 'Only applies if the module is installed and enabled.';
