@@ -38,7 +38,7 @@ function upgrade_module_1_0_8(Module $module): bool
     } catch (Exception $e) {
         PrestaShopLogger::addLog(
             'zeyvro_turnstile upgrade-1.0.8 error: ' . $e->getMessage(),
-            3, null, 'zeyvro_turnstile', 0, true
+            3, null, 'zeyvroturnstile', 0, true
         );
 
         return true; // nunca WSOD — el botón "Actualizar" nativo queda como fallback

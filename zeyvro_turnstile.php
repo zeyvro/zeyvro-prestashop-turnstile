@@ -522,7 +522,7 @@ class Zeyvro_Turnstile extends Module
                         if (function_exists($fn) && !$fn($this)) {
                             PrestaShopLogger::addLog(
                                 'zeyvro_turnstile: upgrade script ' . $sv . ' failed',
-                                3, null, 'zeyvro_turnstile', 0, true
+                                3, null, 'zeyvroturnstile', 0, true
                             );
 
                             return;
@@ -540,7 +540,7 @@ class Zeyvro_Turnstile extends Module
         } catch (Exception $e) {
             PrestaShopLogger::addLog(
                 'zeyvro_turnstile auto-upgrade error: ' . $e->getMessage(),
-                3, null, 'zeyvro_turnstile', 0, true
+                3, null, 'zeyvroturnstile', 0, true
             );
         }
     }

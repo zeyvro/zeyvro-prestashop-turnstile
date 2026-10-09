@@ -19,6 +19,12 @@
  * Constante OPCIONAL (fallback al valor por defecto si no se declara):
  *   PROMO_REMOTE_ENABLED — true (def.) habilita el fetch del feed remoto de promos;
  *                          false en builds para Addons/-nolic (CERO llamadas de red).
+ *   ZV_HOOKS             — hooks propios del módulo (ej. ['actionWatermark']). La
+ *                          auto-reparación registra los que falten en la siguiente carga
+ *                          del BO, ya con el código nuevo (zvEnsureHooks). Un hook nuevo
+ *                          NUNCA se registra en upgrade/*.php: en PS 9 registerHook()
+ *                          comprueba el método sobre la clase vieja aún cargada y la
+ *                          actualización falla.
  *
  * @author    Zeyvro
  * @copyright 2026 Zeyvro
@@ -43,6 +49,173 @@ if (!trait_exists('ZeyvroModuleTrait', false)) {
     trait ZeyvroModuleTrait
     {
         /* =========================================================================
+         * LOG — zvLog() en lugar de PrestaShopLogger::addLog
+         * ======================================================================= */
+
+        /**
+         * Escribe una fila en el log de PrestaShop sin romper nunca la petición.
+         * object_type = nombre técnico del módulo SOLO con letras: PS 8.0.x valida ese campo con
+         * Validate::isName, que rechaza «_» y dígitos, y addLog lanza la excepción → 500
+         * (visto en orderproducts, connections y smartsearch).
+         *
+         * @return bool true si la fila se escribió
+         */
+        public function zvLog(string $msg, int $severity = 1): bool
+        {
+            try {
+                $type = preg_replace('/[^A-Za-z]/', '', isset($this->name) ? (string) $this->name : '');
+
+                return (bool) PrestaShopLogger::addLog($msg, $severity, null, $type !== '' ? $type : 'Zeyvro', 0, true);
+            } catch (Throwable $t) {
+                return false;
+            }
+        }
+
+        /* =========================================================================
+         * OPCACHE — solo los ficheros del propio módulo, para upgrade/*.php
+         * ======================================================================= */
+
+        /**
+         * Invalida en OPcache SOLO los .php de este módulo, para que tras un upgrade la siguiente
+         * petición sirva ya el código nuevo: con opcache.validate_timestamps=0 la clase vieja seguía
+         * en memoria y daba 500 (seoredirect). Nunca vacía la OPcache de toda la tienda.
+         * En CLI no hace nada: la OPcache del servidor web no es la del proceso CLI.
+         *
+         * @return bool true = no queda bytecode viejo del módulo (invalidado, OPcache apagado o CLI)
+         */
+        public function zvInvalidateOwnOpcache(): bool
+        {
+            if (PHP_SAPI === 'cli' || !filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN)) {
+                return true;
+            }
+            if (!function_exists('opcache_invalidate')) {
+                return false;
+            }
+
+            try {
+                $files = new RecursiveIteratorIterator(
+                    new RecursiveDirectoryIterator(_PS_MODULE_DIR_ . $this->name . '/', FilesystemIterator::SKIP_DOTS)
+                );
+                $ok = true;
+                foreach ($files as $file) {
+                    if ($file->isFile() && strtolower($file->getExtension()) === 'php'
+                        && !@opcache_invalidate($file->getPathname(), true)
+                    ) {
+                        $ok = false;
+                    }
+                }
+
+                return $ok;
+            } catch (Throwable $t) {
+                return false;
+            }
+        }
+
+        /* =========================================================================
+         * AYUDAS COMUNES — SQL, rutas de la tienda y destinos de redirección
+         * ======================================================================= */
+
+        /**
+         * Escapa «\», «%» y «_» para usar un texto literal dentro de un patrón LIKE.
+         */
+        public static function zvEscapeLike(string $value): string
+        {
+            return addcslashes($value, '\\%_');
+        }
+
+        /**
+         * Ejecuta una escritura en BD y dice si fue bien. En modo debug Db lanza
+         * PrestaShopDatabaseException ante un error SQL; fuera de él devuelve false. Las dos cosas son fallo,
+         * y el error va al log de PrestaShop, nunca a la respuesta.
+         */
+        public function zvDbWrite(string $sql): bool
+        {
+            try {
+                return (bool) Db::getInstance()->execute($sql);
+            } catch (Exception $e) {
+                $this->zvLog('DB error: ' . $e->getMessage(), 3);
+
+                return false;
+            }
+        }
+
+        /**
+         * Quita la base de la tienda del principio de un path: «/tienda/es/x» con base «/tienda»
+         * -> «/es/x». Un path que no empieza por la base se devuelve tal cual.
+         */
+        public static function zvStripBasePath(string $path, string $base): string
+        {
+            $base = rtrim($base, '/');
+            if ($base === '') {
+                return $path;
+            }
+            if ($path === $base) {
+                return '/';
+            }
+            if (strpos($path, $base . '/') === 0) {
+                return (string) substr($path, strlen($base));
+            }
+
+            return $path;
+        }
+
+        /**
+         * Path relativo a la base de la tienda (tienda instalada en subcarpeta). Solo a una URL absoluta
+         * (la que da Link) se le quita la base: una ruta ya relativa se deja como está, para no quitarla
+         * dos veces.
+         *
+         * @param string $url
+         * @param int|null $id_shop
+         */
+        public function zvToShopPath($url, $id_shop = null): string
+        {
+            $url = (string) $url;
+            $path = preg_replace('#^https?://[^/]+#', '', $url);
+            if ($path === '' || $path[0] !== '/') {
+                $path = '/' . $path;
+            }
+            if (!preg_match('#^https?://#i', $url)) {
+                return $path;
+            }
+
+            return self::zvStripBasePath($path, $this->zvShopBaseUri($id_shop));
+        }
+
+        /**
+         * Base de la tienda (physical_uri + virtual_uri) sin barra final; '' en la raíz del dominio.
+         *
+         * @param int|null $id_shop
+         */
+        public function zvShopBaseUri($id_shop = null): string
+        {
+            static $bases = [];
+            $id_shop = $id_shop === null ? (int) $this->context->shop->id : (int) $id_shop;
+            if (!isset($bases[$id_shop])) {
+                $shop = new Shop($id_shop);
+                $bases[$id_shop] = Validate::isLoadedObject($shop) ? rtrim((string) $shop->getBaseURI(), '/') : '';
+            }
+
+            return $bases[$id_shop];
+        }
+
+        /**
+         * Lista blanca del destino de una redirección: URL relativa o http/https.
+         * Se usa al guardar (BO) y antes de responder al front, para que un destino
+         * javascript:, data:, vbscript:... nunca llegue a window.location.
+         */
+        public static function zvIsAllowedRedirectUrl(string $url): bool
+        {
+            if ($url === '' || preg_match('/[\x00-\x20\x7f\\\\]/', $url)) {
+                return false;
+            }
+            if (preg_match('#^[a-z][a-z0-9+.\-]*:#i', $url)) {
+                return (bool) preg_match('#^https?://[^/?\#]#i', $url);
+            }
+
+            return strpos($url, '//') !== 0;
+        }
+
+        /* =========================================================================
          * TABS — ensureTabs() idempotente, sin early-return
          * ======================================================================= */
 
@@ -63,10 +236,7 @@ if (!trait_exists('ZeyvroModuleTrait', false)) {
 
                 return true;
             } catch (Exception $e) {
-                PrestaShopLogger::addLog(
-                    '[ZeyvroModuleTrait] ensureTabs error: ' . $e->getMessage(),
-                    3, null, $this->name, 0, true
-                );
+                $this->zvLog('[ZeyvroModuleTrait] ensureTabs error: ' . $e->getMessage(), 3);
 
                 return false;
             }
@@ -254,17 +424,61 @@ if (!trait_exists('ZeyvroModuleTrait', false)) {
 
         /**
          * Se dispara en cada carga del BO.
-         * Guarded por flag: solo ejecuta si el schema de tabs no coincide.
-         * Garantiza que, tras subir el ZIP, los tabs se reparan en la siguiente
+         * 1) Registra los hooks de ZV_HOOKS que falten (zvEnsureHooks, guarded por firma).
+         * 2) Guarded por flag: los tabs solo se reparan si el schema de tabs no coincide.
+         * Garantiza que, tras subir el ZIP, hooks y tabs se reparan en la siguiente
          * carga sin necesidad de desinstalar ni limpiar caché manualmente.
          */
         public function hookActionAdminControllerSetMedia($params): void
         {
+            $this->zvEnsureHooks();
             if (Configuration::get(static::ZV_SCHEMA_KEY) === static::ZV_SCHEMA_TABV) {
                 return;
             }
             $this->ensureTabs();
             Configuration::updateValue(static::ZV_SCHEMA_KEY, static::ZV_SCHEMA_TABV);
+        }
+
+        /**
+         * Registra los hooks que el módulo declara en la constante opcional ZV_HOOKS y le
+         * falten. Idempotente: registerHook() salta los que ya están. Guarded por una firma
+         * (versión + lista) en la clave ZV_SCHEMA_KEY . '_HOOKS': solo trabaja en la primera
+         * carga del BO tras instalar o actualizar. Nunca rompe la petición.
+         *
+         * @return bool true si todos los hooks declarados quedan registrados (o no hay ninguno)
+         */
+        public function zvEnsureHooks(): bool
+        {
+            $const = get_class($this) . '::ZV_HOOKS';
+            if (!defined($const)) {
+                return true;
+            }
+            $hooks = array_values(array_filter((array) constant($const), 'is_string'));
+            if (!$hooks) {
+                return true;
+            }
+            $key = static::ZV_SCHEMA_KEY . '_HOOKS';
+            $firma = md5($this->version . '|' . implode(',', $hooks));
+            if (Configuration::get($key) === $firma) {
+                return true;
+            }
+            $ok = true;
+            foreach ($hooks as $hook) {
+                try {
+                    if (!$this->registerHook($hook)) {
+                        $ok = false;
+                        $this->zvLog('zvEnsureHooks: no se pudo registrar el hook ' . $hook, 3);
+                    }
+                } catch (Throwable $t) {
+                    $ok = false;
+                    $this->zvLog('zvEnsureHooks: ' . $hook . ': ' . $t->getMessage(), 3);
+                }
+            }
+            if ($ok) {
+                Configuration::updateValue($key, $firma);
+            }
+
+            return $ok;
         }
 
         /* =========================================================================
@@ -294,6 +508,7 @@ if (!trait_exists('ZeyvroModuleTrait', false)) {
         {
             $this->zvUninstallTab();
             $this->unregisterHook('actionAdminControllerSetMedia');
+            Configuration::deleteByName(static::ZV_SCHEMA_KEY . '_HOOKS');
         }
 
         /* =========================================================================

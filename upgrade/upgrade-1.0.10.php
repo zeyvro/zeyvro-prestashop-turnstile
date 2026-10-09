@@ -23,7 +23,7 @@ function upgrade_module_1_0_10(Module $module): bool
     } catch (Exception $e) {
         PrestaShopLogger::addLog(
             'zeyvro_turnstile upgrade-1.0.10 error: ' . $e->getMessage(),
-            3, null, 'zeyvro_turnstile', 0, true
+            3, null, 'zeyvroturnstile', 0, true
         );
 
         return true;
