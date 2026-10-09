@@ -58,7 +58,7 @@ class Zeyvro_Turnstile extends Module
     {
         $this->name = 'zeyvro_turnstile';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.10';
+        $this->version = '1.2.0';
         $this->author = 'Zeyvro';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => '9.1.3'];
@@ -68,7 +68,7 @@ class Zeyvro_Turnstile extends Module
 
         $this->displayName = $this->l('Zeyvro Turnstile');
         $this->description = $this->l(
-            'Anti-spam protection with Cloudflare Turnstile on the PrestaShop contact form.'
+            'Anti-spam protection with Cloudflare Turnstile on the contact, registration, login and password recovery forms, blog comments and back-in-stock alerts.'
         );
 
         // §7.1 — Auto-upgrade al subir ZIP por BO

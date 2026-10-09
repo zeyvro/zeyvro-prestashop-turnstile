@@ -13,7 +13,7 @@ global $_MODULE;
 $_MODULE = [];
 
 $_MODULE['<{zeyvro_turnstile}prestashop>zeyvro_turnstile_5527b6b01dcf35691545691a8a79e27c'] = 'Zeyvro Turnstile';
-$_MODULE['<{zeyvro_turnstile}prestashop>zeyvro_turnstile_c1fef78503f22ff160104319a0e62f49'] = 'Anti-spam protection with Cloudflare Turnstile on the PrestaShop contact form.';
+$_MODULE['<{zeyvro_turnstile}prestashop>zeyvro_turnstile_1626bc9ab73742f2e9d129bf06488d67'] = 'Protección antispam con Cloudflare Turnstile en los formularios de contacto, registro, inicio de sesión y recuperar contraseña, en los comentarios del blog y en los avisos de reposición.';
 $_MODULE['<{zeyvro_turnstile}prestashop>zeyvro_turnstile_4827ecb3ad37d0623827e275419c288f'] = 'Verificación de seguridad fallida. Por favor, inténtalo de nuevo.';
 $_MODULE['<{zeyvro_turnstile}prestashop>zeyvro_turnstile_f4b30c2fe83dab2f1db5ce70f7253749'] = 'Log de verificaciones (últimas 50)';
 $_MODULE['<{zeyvro_turnstile}prestashop>zeyvro_turnstile_44749712dbec183e983dcd78a7736c41'] = 'Fecha';
@@ -67,3 +67,11 @@ $_MODULE['<{zeyvro_turnstile}prestashop>settings_6e2699df1ac68a5e4b5a19a49e40aaf
 $_MODULE['<{zeyvro_turnstile}prestashop>settings_8db3a00357917cdbc16e6f0aed3cc6e7'] = 'Total en BD: ';
 $_MODULE['<{zeyvro_turnstile}prestashop>zeyvro_turnstile_212648795ee66b21e544548fc3e0c896'] = 'Módulos premium para PrestaShop 8 — sin suscripciones, sin ataduras. Código limpio, pago único.';
 $_MODULE['<{zeyvro_turnstile}prestashop>zeyvro_turnstile_e1a028559f9f53b63f6b88387a29d91d'] = 'Descúbrelos →';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_bbf34ed6c83f4fc9ec29ab2339fad012'] = 'Proteger el formulario de registro';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_2c85c39a6426f128d999fe418e870b95'] = 'No cubre la creación de cuenta dentro del proceso de compra.';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_0cc55a94a6686b831c76b6467dad2d48'] = 'Proteger el formulario de inicio de sesión';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_6696a302296be9642ff7e3b1e9f1e7b9'] = 'Cubre también la ventana de inicio de sesión de los temas que la envían a la página de login nativa.';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_82e614267ca0cf8db60ad0fcd6d3161c'] = 'Proteger el formulario de recuperar contraseña';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_35c5dd69680a3f8a05b5d0e83a394a68'] = 'Proteger los comentarios del blog (prestablog)';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_531072ee100837c72c92a2a29e376693'] = 'Proteger los avisos de reposición (ps_emailalerts)';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_62fa42c57273d2aaab44a3924ffe7c2a'] = 'Solo actúa si el módulo está instalado y activo.';

@@ -5,6 +5,38 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ---
 
+## 1.2.0 — 2026-10-09
+
+### Añadido (ES)
+- **Turnstile en más formularios**, cada uno con su interruptor en el panel (**PERSONALIZAR → Zeyvro → Anti SPAM**):
+  - **Registro de cliente.** Si la verificación falla, la cuenta no se crea y el aviso sale en el propio formulario. La creación de cuenta dentro del proceso de compra no está cubierta.
+  - **Inicio de sesión**, también en la ventana de inicio de sesión de los temas que la envían a la página de login nativa. Fuera de la página de login, el script de Cloudflare solo se carga cuando el visitante empieza a usar esa ventana.
+  - **Recuperar contraseña** (el formulario que pide el enlace).
+  - **Comentarios del blog de prestablog**, si está instalado y activo. El aviso sale en el bloque de avisos de la página.
+  - **Avisos de reposición de ps_emailalerts**, si está instalado y activo. El aviso sale en el propio bloque.
+- Igual que el contacto: misma «Acción si falla la verificación» (bloquear o solo registrar) y mismo registro de intentos. El interruptor general sigue mandando sobre todos.
+- El login, la contraseña, prestablog y ps_emailalerts se comprueban también cuando el envío llega por AJAX.
+
+### Cambiado (ES)
+- El formulario de contacto funciona igual que en la 1.1.10.
+- En una instalación nueva los 5 interruptores vienen **encendidos**. **Al actualizar desde la 1.1.x vienen apagados**: nada cambia en la tienda hasta que los enciendas.
+- `upgrade/upgrade-1.2.0.php`: crea apagados los 5 interruptores (sin tocar los que ya existan), registra los hooks `actionDispatcher` y `actionSubmitAccountBefore` y limpia la caché del módulo. Idempotente.
+
+### Added (EN)
+- **Turnstile on more forms**, each with its own switch in the panel (**CUSTOMIZE → Zeyvro → Anti SPAM**):
+  - **Customer registration.** If the check fails, the account is not created and the notice shows in the form itself. Account creation inside the checkout is not covered.
+  - **Login**, including the login window of themes that send it to the native login page. Outside the login page, the Cloudflare script only loads when the visitor starts using that window.
+  - **Password recovery** (the form that asks for the link).
+  - **prestablog blog comments**, if installed and enabled. The notice shows in the page's notification block.
+  - **ps_emailalerts back-in-stock alerts**, if installed and enabled. The notice shows in the alert block itself.
+- Same as the contact form: same "Action on verification failure" (block or log only) and same attempt log. The main switch still rules them all.
+- Login, password, prestablog and ps_emailalerts are also checked when the request comes through AJAX.
+
+### Changed (EN)
+- The contact form works exactly as in 1.1.10.
+- On a new install the 5 new switches are **on**. **When upgrading from 1.1.x they are off**: nothing changes in the shop until you turn them on.
+- `upgrade/upgrade-1.2.0.php`: creates the 5 switches off (without touching existing ones), registers the `actionDispatcher` and `actionSubmitAccountBefore` hooks and clears the module cache. Idempotent.
+
 ## 1.1.10 — 2026-09-24
 
 ### Cambiado (ES)
