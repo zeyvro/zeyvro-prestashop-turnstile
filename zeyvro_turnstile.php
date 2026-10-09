@@ -203,6 +203,7 @@ class Zeyvro_Turnstile extends Module
             'register' => $phpSelf === 'registration' && $this->isFormOn('register'),
             // En todas las páginas: la ventana de login de los temas envía a la página de login nativa
             'login' => !$this->context->customer->isLogged() && $this->isFormOn('login'),
+            'password' => $phpSelf === 'password' && $this->isFormOn('password'),
         ];
         if (!in_array(true, $forms, true)) {
             return '';
@@ -368,6 +369,10 @@ class Zeyvro_Turnstile extends Module
         if ($phpSelf === 'authentication' && Tools::isSubmit('submitLogin')) {
             $form = 'login';
             $keys = ['submitLogin', 'submitLogin_x', 'submitLogin_y'];
+        } elseif ($phpSelf === 'password' && Tools::isSubmit('email')) {
+            // Solo la petición del enlace; el formulario de la nueva contraseña (token + passwd) no se toca
+            $form = 'password';
+            $keys = ['email'];
         }
         if ($form === null || !$this->isFormOn($form) || $this->verifyFormToken($form)) {
             return;

@@ -178,6 +178,11 @@
                 addWidget(form, submitButton(form), 'login', page !== 'authentication');
                 return;
             }
+            if (on('password') && form.querySelector('input[name="email"]')
+                && !form.querySelector('[name="submitNewsletter"], input[name="password"], input[name="passwd"]')) {
+                addWidget(form, submitButton(form), 'password', false);
+                return;
+            }
             // (formularios v1.2.0)
         });
         // (fuera de un <form>, v1.2.0)
