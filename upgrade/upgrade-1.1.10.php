@@ -43,7 +43,7 @@ function upgrade_module_1_1_10($module)
         if (!$ok) {
             PrestaShopLogger::addLog(
                 'zeyvro_turnstile upgrade 1.1.10: OPcache not invalidated, the server may still serve the old code',
-                2, null, 'zeyvro_turnstile', 0, true
+                2, null, 'zeyvroturnstile', 0, true
             );
         }
     }
