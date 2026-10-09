@@ -24,6 +24,7 @@ class Zeyvro_Turnstile extends Module
     public const ZV_LICENSE_TYPE = 'free';
     public const ZV_SCHEMA_TABV = 'A';               // cambiar solo si la estructura de tabs cambia
     public const ZV_SCHEMA_KEY = 'ZEYVROTURNSTILE_TABV';
+    public const ZV_HOOKS = ['actionDispatcher', 'actionSubmitAccountBefore'];   // v1.2.0 — zvEnsureHooks
 
     // ── Config keys propios del módulo ────────────────────────────────────
     public const CONFIG_KEYS = [
@@ -74,6 +75,11 @@ class Zeyvro_Turnstile extends Module
         // §7.1 — Auto-upgrade al subir ZIP por BO
         if (defined('_PS_ADMIN_DIR_') && !defined('ZEYVROTURNSTILE_UPGRADING')) {
             $this->runAutoUpgrade();
+            // v1.2.0 — los hooks nuevos (ZV_HOOKS) se registran aquí, ya con la clase nueva cargada, y no en
+            // upgrade-1.2.0.php: en PS 9 registerHook() mira el método en la clase vieja y la actualización falla.
+            if ($this->id) {
+                $this->zvEnsureHooks();
+            }
         }
     }
 

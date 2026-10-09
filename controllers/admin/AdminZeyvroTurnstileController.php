@@ -285,8 +285,10 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
         ];
 
         $fieldsValue = [];
-        foreach (Zeyvro_Turnstile::CONFIG_KEYS as $k) {
-            $fieldsValue[$k] = Configuration::get($k);
+        // v1.2.0 — de los campos que pinta este formulario, no de Zeyvro_Turnstile::CONFIG_KEYS: justo tras subir el
+        // ZIP el servidor puede seguir sirviendo la clase vieja y sin las claves nuevas el formulario da error 500.
+        foreach ($fields as $field) {
+            $fieldsValue[$field['name']] = Configuration::get($field['name']);
         }
 
         $helper = new HelperForm();

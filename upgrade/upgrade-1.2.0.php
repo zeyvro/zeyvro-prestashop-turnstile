@@ -16,7 +16,9 @@ if (!defined('_PS_VERSION_')) {
  *
  * Los interruptores se crean APAGADOS: quien sube desde la 1.1.x sigue igual que antes hasta que los encienda
  * en el panel. Solo se crean si no existen, para no apagar los que el cliente ya haya encendido.
- * Registra los hooks nuevos (actionDispatcher y actionSubmitAccountBefore).
+ * Los hooks nuevos (actionDispatcher y actionSubmitAccountBefore) NO se registran aquí: en PS 9 registerHook()
+ * comprueba el método sobre la clase vieja aún cargada y la actualización falla. Los registra zvEnsureHooks()
+ * (constante ZV_HOOKS) en la siguiente carga del BO, ya con la clase nueva.
  *
  * Como la 1.1.10: invalida en OPcache solo los .php del propio módulo. NUNCA opcache_reset().
  *
@@ -36,10 +38,6 @@ function upgrade_module_1_2_0($module)
             Configuration::updateValue($key, 0);
         }
     }
-    if (!$module->registerHook('actionDispatcher') || !$module->registerHook('actionSubmitAccountBefore')) {
-        return false;
-    }
-
     if (filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN)) {
         $ok = function_exists('opcache_invalidate');
         if ($ok) {
