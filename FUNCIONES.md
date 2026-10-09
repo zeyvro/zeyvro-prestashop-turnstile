@@ -7,7 +7,7 @@
 
 | ID | Función | Dónde | Qué hace |
 |---|---|---|---|
-| F1 | Constructor | `__construct` :57-78 | Versión 1.2.0, compatibilidad 8.0.0-9.1.3 y, en el BO, auto-upgrade (F12). |
+| F1 | Constructor | `__construct` :57-78 | Versión 1.2.0, compatibilidad 8.0.0-9.2.0 y, en el BO, auto-upgrade (F12). |
 | F2 | Instalación | `install` :84-95 | Base común del trait, tabla, configuración y 5 hooks: `displayHeader`, `displayBeforeBodyClosingTag`, `actionFrontControllerSetMedia`, `actionDispatcher` y `actionSubmitAccountBefore` (los dos últimos desde la 1.2.0). |
 | F3 | Desinstalación conservadora | `uninstall` :97-109 | Quita tab y hooks; la tabla de log y la configuración se conservan. |
 | F4 | Tabla de log | `installSql` :111-126 | Crea `zeyvro_turnstile_log` si no existe. |
