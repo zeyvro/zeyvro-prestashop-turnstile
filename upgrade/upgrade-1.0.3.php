@@ -12,13 +12,13 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_1_0_3(Module $module): bool
 {
-    $idTab = _upgrade103TabId('AdminZeyvroTurnstile');
+    $idTab = zeyvroturnstile_upgrade103TabId('AdminZeyvroTurnstile');
     if ($idTab <= 0) {
         // No existe la tab → install() la creará al final del flujo.
         return true;
     }
 
-    $idParent = _upgrade103TabId('AdminParentCustomerThreads');
+    $idParent = zeyvroturnstile_upgrade103TabId('AdminParentCustomerThreads');
     if ($idParent <= 0) {
         // Menú padre no encontrado — no romper, dejar como esté.
         return true;
@@ -38,7 +38,7 @@ function upgrade_module_1_0_3(Module $module): bool
  * id_tab por class_name, 0 si no existe (como ZeyvroModuleTrait::zvTabIdFromClassName; sin
  * el método estático de Tab que busca por class_name, deprecado desde PrestaShop 1.7.1.0).
  */
-function _upgrade103TabId(string $class_name): int
+function zeyvroturnstile_upgrade103TabId(string $class_name): int
 {
     return (int) Db::getInstance()->getValue(
         'SELECT `id_tab` FROM `' . _DB_PREFIX_ . 'tab` WHERE `class_name` = "' . pSQL($class_name) . '"'

@@ -23,9 +23,9 @@ function upgrade_module_1_0_7(Module $module): bool
         $db = Db::getInstance();
 
         // -- 1. Determinar id_parent correcto: IMPROVE -> AdminParentModulesSf
-        $id_improve = _upgrade107TabId('IMPROVE');
+        $id_improve = zeyvroturnstile_upgrade107TabId('IMPROVE');
         $id_target_parent = $id_improve
-            ?: _upgrade107TabId('AdminParentModulesSf');
+            ?: zeyvroturnstile_upgrade107TabId('AdminParentModulesSf');
 
         if (!$id_target_parent) {
             PrestaShopLogger::addLog(
@@ -65,7 +65,7 @@ function upgrade_module_1_0_7(Module $module): bool
                 return false;
             }
             $id_zeyvro_parent = (int) $parent->id;
-            _upgrade107CreateTabRoles('AdminZeyvroParent', $db);
+            zeyvroturnstile_upgrade107CreateTabRoles('AdminZeyvroParent', $db);
         } else {
             // Usar el primero; borrar duplicados reasignando sus hijos al primero
             $canonical = array_shift($parents);
@@ -90,7 +90,7 @@ function upgrade_module_1_0_7(Module $module): bool
         }
 
         // -- 3. Eliminar AdminZeyvroGroup si existe
-        $id_group = _upgrade107TabId('AdminZeyvroGroup');
+        $id_group = zeyvroturnstile_upgrade107TabId('AdminZeyvroGroup');
         if ($id_group) {
             // Reparentar hijos al AdminZeyvroParent canonico antes de borrar
             $db->execute(
@@ -102,7 +102,7 @@ function upgrade_module_1_0_7(Module $module): bool
         }
 
         // -- 4. Reparar/crear AdminZeyvroTurnstile
-        $id_child = _upgrade107TabId('AdminZeyvroTurnstile');
+        $id_child = zeyvroturnstile_upgrade107TabId('AdminZeyvroTurnstile');
         if ($id_child) {
             // Ya existe: asegurar id_parent correcto y nombre "Anti SPAM"
             $tab = new Tab($id_child);
@@ -128,7 +128,7 @@ function upgrade_module_1_0_7(Module $module): bool
             $tab->icon = 'verified_user';
             $tab->add();
         }
-        _upgrade107CreateTabRoles('AdminZeyvroTurnstile', $db);
+        zeyvroturnstile_upgrade107CreateTabRoles('AdminZeyvroTurnstile', $db);
 
         // -- 5. Cache
         if (function_exists('opcache_reset')) {
@@ -141,7 +141,7 @@ function upgrade_module_1_0_7(Module $module): bool
     } catch (Exception $e) {
         PrestaShopLogger::addLog(
             'zeyvro_turnstile upgrade-1.0.7 error: ' . $e->getMessage(),
-            3, null, 'zeyvro_turnstile', 0, true
+            3, null, 'zeyvroturnstile', 0, true
         );
 
         return true; // nunca WSOD — el boton Actualizar nativo queda como fallback
@@ -152,14 +152,14 @@ function upgrade_module_1_0_7(Module $module): bool
  * id_tab por class_name, 0 si no existe (como ZeyvroModuleTrait::zvTabIdFromClassName; sin
  * el método estático de Tab que busca por class_name, deprecado desde PrestaShop 1.7.1.0).
  */
-function _upgrade107TabId(string $class_name): int
+function zeyvroturnstile_upgrade107TabId(string $class_name): int
 {
     return (int) Db::getInstance()->getValue(
         'SELECT `id_tab` FROM `' . _DB_PREFIX_ . 'tab` WHERE `class_name` = "' . pSQL($class_name) . '"'
     );
 }
 
-function _upgrade107CreateTabRoles(string $class_name, $db): void
+function zeyvroturnstile_upgrade107CreateTabRoles(string $class_name, $db): void
 {
     $actions = ['CREATE', 'READ', 'UPDATE', 'DELETE'];
     $slug_prefix = 'ROLE_MOD_TAB_' . Tools::strtoupper($class_name) . '_';
