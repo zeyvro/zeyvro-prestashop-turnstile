@@ -169,6 +169,10 @@
 
     function sbtInjectForms() {
         document.querySelectorAll('form').forEach(function (form) {
+            if (on('register') && form.querySelector('[name="submitCreate"]')) {
+                addWidget(form, submitButton(form) || form.querySelector('[name="submitCreate"]'), 'register', false);
+                return;
+            }
             // (formularios v1.2.0)
         });
         // (fuera de un <form>, v1.2.0)

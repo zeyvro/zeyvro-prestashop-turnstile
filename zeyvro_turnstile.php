@@ -200,6 +200,7 @@ class Zeyvro_Turnstile extends Module
             : null;
         $forms = [
             'contact' => $phpSelf === 'contact',
+            'register' => $phpSelf === 'registration' && $this->isFormOn('register'),
         ];
         if (!in_array(true, $forms, true)) {
             return '';
@@ -323,6 +324,23 @@ class Zeyvro_Turnstile extends Module
         self::$sbtFailed[$form] = true;
 
         return false;
+    }
+
+    /**
+     * v1.2.0 — Registro. El núcleo ejecuta este hook en RegistrationController::initContent() justo antes de
+     * $register_form->submit() y devolver false impide crear la cuenta (corre también con ajax=1).
+     * Desde 8.2 el checkout también lo ejecuta (CheckoutPersonalInformationStep): ahí no se toca, el checkout
+     * de invitado queda fuera de esta versión.
+     */
+    public function hookActionSubmitAccountBefore($params): bool
+    {
+        if (!isset($this->context->controller->php_self)
+            || $this->context->controller->php_self !== 'registration'
+            || !$this->isFormOn('register')) {
+            return true;
+        }
+
+        return $this->verifyFormToken('register');
     }
 
     /* =====================================================================
