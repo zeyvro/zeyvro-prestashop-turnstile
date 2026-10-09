@@ -205,6 +205,7 @@ class Zeyvro_Turnstile extends Module
             'login' => !$this->context->customer->isLogged() && $this->isFormOn('login'),
             'password' => $phpSelf === 'password' && $this->isFormOn('password'),
             'prestablog' => $this->currentModuleName() === 'prestablog' && $this->isFormOn('prestablog'),
+            'emailalerts' => $phpSelf === 'product' && $this->isFormOn('emailalerts'),
         ];
         if (!in_array(true, $forms, true)) {
             return '';
@@ -237,6 +238,13 @@ class Zeyvro_Turnstile extends Module
         // v1.2.0 — mensajes de los envíos rechazados en actionDispatcher (aquí el idioma ya está resuelto)
         if (!empty(self::$sbtFailed['prestablog'])) {
             $this->context->controller->errors[] = $this->l('Security verification failed. Please try again.');
+        }
+        if (!empty(self::$sbtFailed['emailalerts'])) {
+            // Mismo contrato que ps_emailalerts/controllers/front/actions.php: su JS hace JSON.parse de la respuesta
+            exit(json_encode([
+                'error' => true,
+                'message' => $this->l('Security verification failed. Please try again.'),
+            ]));
         }
         if (!(int) Configuration::get('ZEYVRO_TURNSTILE_ENABLED')) {
             return;
@@ -381,6 +389,9 @@ class Zeyvro_Turnstile extends Module
         } elseif ($this->currentModuleName() === 'prestablog' && Tools::isSubmit('submitComment')) {
             $form = 'prestablog';
             $keys = ['submitComment', 'submitComment_x', 'submitComment_y'];
+        } elseif ($this->currentModuleName() === 'ps_emailalerts' && Tools::getValue('process') === 'add') {
+            $form = 'emailalerts';
+            $keys = ['process'];
         }
         if ($form === null || !$this->isFormOn($form) || $this->verifyFormToken($form)) {
             return;

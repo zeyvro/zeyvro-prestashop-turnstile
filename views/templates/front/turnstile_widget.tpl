@@ -167,6 +167,27 @@
         }
     }
 
+    // Añade el token al POST de ps_emailalerts y reinicia el widget tras cada envío (un token vale una vez)
+    function sbtMailalertsToken() {
+        if (!window.jQuery || window.sbtMailalertsToken) { return; }
+        window.sbtMailalertsToken = true;
+        window.jQuery.ajaxPrefilter(function (options, original, jqXHR) {
+            var url = String(options.url || '');
+            if (url.indexOf('ps_emailalerts') === -1 || !/[?&]process=add\b/.test(url)) { return; }
+            var widget = document.querySelector('.js-mailalert .sbt-turnstile-widget');
+            if (!widget) { return; }
+            var input = widget.querySelector('input[name="cf-turnstile-response"]');
+            var token = input ? input.value : '';
+            options.data = (options.data ? options.data + '&' : '') + 'cf-turnstile-response=' + encodeURIComponent(token);
+            jqXHR.always(function () {
+                var wid = widget.getAttribute('data-sbt-wid');
+                if (window.turnstile && wid) {
+                    try { window.turnstile.reset(wid); } catch (e) {}
+                }
+            });
+        });
+    }
+
     function sbtInjectForms() {
         document.querySelectorAll('form').forEach(function (form) {
             if (on('register') && form.querySelector('[name="submitCreate"]')) {
@@ -187,9 +208,14 @@
                 addWidget(form, form.querySelector('[name="submitComment"]'), 'prestablog', false);
                 return;
             }
-            // (formularios v1.2.0)
         });
-        // (fuera de un <form>, v1.2.0)
+        // ps_emailalerts: no es un <form>, su JS arma el POST a mano
+        if (on('emailalerts')) {
+            document.querySelectorAll('.js-mailalert').forEach(function (box) {
+                addWidget(box, box.querySelector('.js-mailalert-add'), 'emailalerts', false);
+            });
+            sbtMailalertsToken();
+        }
     }
 
     function sbtInit() {
