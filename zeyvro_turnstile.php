@@ -310,8 +310,7 @@ class Zeyvro_Turnstile extends Module
     private function currentModuleName(): string
     {
         $controller = $this->context->controller;
-        if ($controller instanceof ModuleFrontController && isset($controller->module)
-            && $controller->module instanceof Module) {
+        if ($controller instanceof ModuleFrontController && $controller->module instanceof Module) {
             return (string) $controller->module->name;
         }
 
