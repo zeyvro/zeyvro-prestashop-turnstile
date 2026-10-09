@@ -20,7 +20,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 ### Cambiado (ES)
 - El formulario de contacto funciona igual que en la 1.1.10.
 - En una instalación nueva los 5 interruptores vienen **encendidos**. **Al actualizar desde la 1.1.x vienen apagados**: nada cambia en la tienda hasta que los enciendas.
-- `upgrade/upgrade-1.2.0.php`: crea apagados los 5 interruptores (sin tocar los que ya existan), registra los hooks `actionDispatcher` y `actionSubmitAccountBefore` y limpia la caché del módulo. Idempotente.
+- `upgrade/upgrade-1.2.0.php`: crea apagados los 5 interruptores (sin tocar los que ya existan) y limpia la caché del módulo. Idempotente. Los hooks nuevos `actionDispatcher` y `actionSubmitAccountBefore` se registran en la siguiente carga del BO, ya con el código nuevo: en PrestaShop 9 registrarlos dentro del upgrade hacía fallar la actualización.
 
 ### Added (EN)
 - **Turnstile on more forms**, each with its own switch in the panel (**CUSTOMIZE → Zeyvro → Anti SPAM**):
@@ -35,7 +35,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 ### Changed (EN)
 - The contact form works exactly as in 1.1.10.
 - On a new install the 5 new switches are **on**. **When upgrading from 1.1.x they are off**: nothing changes in the shop until you turn them on.
-- `upgrade/upgrade-1.2.0.php`: creates the 5 switches off (without touching existing ones), registers the `actionDispatcher` and `actionSubmitAccountBefore` hooks and clears the module cache. Idempotent.
+- `upgrade/upgrade-1.2.0.php`: creates the 5 switches off (without touching existing ones) and clears the module cache. Idempotent. The new `actionDispatcher` and `actionSubmitAccountBefore` hooks are registered on the next back-office load, with the new code already in place: on PrestaShop 9, registering them inside the upgrade made the upgrade fail.
 
 ## 1.1.10 — 2026-09-24
 
