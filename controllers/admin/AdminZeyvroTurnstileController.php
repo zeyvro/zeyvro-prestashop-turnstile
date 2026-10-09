@@ -65,6 +65,11 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
             'ZEYVRO_TURNSTILE_ACTION_ON_FAIL' => 'string',
             'ZEYVRO_TURNSTILE_LOG_ENABLED' => 'int',
             'ZEYVRO_TURNSTILE_API_TIMEOUT' => 'int',
+            'ZEYVRO_TURNSTILE_FORM_REGISTER' => 'int',
+            'ZEYVRO_TURNSTILE_FORM_LOGIN' => 'int',
+            'ZEYVRO_TURNSTILE_FORM_PASSWORD' => 'int',
+            'ZEYVRO_TURNSTILE_FORM_PRESTABLOG' => 'int',
+            'ZEYVRO_TURNSTILE_FORM_EMAILALERTS' => 'int',
         ];
 
         $allowedModes = ['managed', 'invisible', 'non-interactive'];
@@ -143,6 +148,28 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
         $this->context->smarty->assign('content', $this->content);
     }
 
+    /**
+     * v1.2.0 — interruptor Sí/No de un formulario protegido.
+     */
+    private function formSwitch(string $key, string $label, string $desc): array
+    {
+        $field = [
+            'type' => 'switch',
+            'label' => $label,
+            'name' => $key,
+            'is_bool' => true,
+            'values' => [
+                ['id' => $key . '_on',  'value' => 1, 'label' => $this->l('Yes')],
+                ['id' => $key . '_off', 'value' => 0, 'label' => $this->l('No')],
+            ],
+        ];
+        if ($desc !== '') {
+            $field['desc'] = $desc;
+        }
+
+        return $field;
+    }
+
     private function renderSettingsForm(): string
     {
         $fields = [
@@ -157,6 +184,31 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
                 ],
                 'desc' => $this->l('Disable it to temporarily deactivate without uninstalling.'),
             ],
+            $this->formSwitch(
+                'ZEYVRO_TURNSTILE_FORM_REGISTER',
+                $this->l('Protect registration form'),
+                $this->l('Account creation inside the checkout is not covered.')
+            ),
+            $this->formSwitch(
+                'ZEYVRO_TURNSTILE_FORM_LOGIN',
+                $this->l('Protect login form'),
+                $this->l('Also covers the login window of themes that send it to the native login page.')
+            ),
+            $this->formSwitch(
+                'ZEYVRO_TURNSTILE_FORM_PASSWORD',
+                $this->l('Protect password recovery form'),
+                ''
+            ),
+            $this->formSwitch(
+                'ZEYVRO_TURNSTILE_FORM_PRESTABLOG',
+                $this->l('Protect blog comments (prestablog)'),
+                $this->l('Only applies if the module is installed and enabled.')
+            ),
+            $this->formSwitch(
+                'ZEYVRO_TURNSTILE_FORM_EMAILALERTS',
+                $this->l('Protect back-in-stock alerts (ps_emailalerts)'),
+                $this->l('Only applies if the module is installed and enabled.')
+            ),
             [
                 'type' => 'password',
                 'label' => $this->l('Site Key'),
