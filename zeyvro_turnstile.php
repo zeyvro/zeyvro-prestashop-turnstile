@@ -24,7 +24,7 @@ class Zeyvro_Turnstile extends Module
     public const ZV_LICENSE_TYPE = 'free';
     public const ZV_SCHEMA_TABV = 'A';               // cambiar solo si la estructura de tabs cambia
     public const ZV_SCHEMA_KEY = 'ZEYVROTURNSTILE_TABV';
-    public const ZV_HOOKS = ['actionDispatcher', 'actionSubmitAccountBefore'];   // v1.2.0 — zvEnsureHooks
+    public const ZV_HOOKS = ['actionDispatcher', 'actionSubmitAccountBefore'];   // v1.2.0 — turnstileEnsureHooks
 
     // ── Config keys propios del módulo ────────────────────────────────────
     public const CONFIG_KEYS = [
@@ -78,8 +78,43 @@ class Zeyvro_Turnstile extends Module
             // v1.2.0 — los hooks nuevos (ZV_HOOKS) se registran aquí, ya con la clase nueva cargada, y no en
             // upgrade-1.2.0.php: en PS 9 registerHook() mira el método en la clase vieja y la actualización falla.
             if ($this->id) {
-                $this->zvEnsureHooks();
+                $this->turnstileEnsureHooks();
             }
+        }
+    }
+
+    /**
+     * Registra los hooks de ZV_HOOKS que falten. Misma lógica que zvEnsureHooks() del trait, pero en la clase:
+     * ZeyvroModuleTrait es global y cada módulo Zeyvro trae su copia con trait_exists(), así que gana la primera
+     * que se carga. Con otro módulo Zeyvro de trait anterior cargado antes, zvEnsureHooks() no existe y llamarlo
+     * desde el constructor tumbaba todo el BO con un 500 (convivencia ps-8-2, 2026-10-09). Idempotente y guarded
+     * por firma (versión + lista) en ZV_SCHEMA_KEY . '_HOOKS', la misma clave que el trait. Nunca rompe la petición.
+     *
+     * @return bool true si todos los hooks declarados quedan registrados
+     */
+    private function turnstileEnsureHooks(): bool
+    {
+        try {
+            $key = self::ZV_SCHEMA_KEY . '_HOOKS';
+            $firma = md5($this->version . '|' . implode(',', self::ZV_HOOKS));
+            if (Configuration::get($key) === $firma) {
+                return true;
+            }
+            $ok = true;
+            foreach (self::ZV_HOOKS as $hook) {
+                if (!$this->registerHook($hook)) {
+                    $ok = false;
+                    $msg = 'turnstileEnsureHooks: no se pudo registrar el hook ' . $hook;
+                    PrestaShopLogger::addLog($msg, 3, null, 'ZeyvroTurnstile', 0, true);
+                }
+            }
+            if ($ok) {
+                Configuration::updateValue($key, $firma);
+            }
+
+            return $ok;
+        } catch (Throwable $t) {
+            return false;
         }
     }
 
