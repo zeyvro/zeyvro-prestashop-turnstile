@@ -16,7 +16,7 @@
      data-sbt-page="{$sbt_page|escape:'html':'UTF-8'}"
      data-sbt-auth-url="{$sbt_auth_url|escape:'htmlall':'UTF-8'}"
      data-sbt-failed="{$sbt_failed|escape:'html':'UTF-8'}"
-     data-sbt-error="{$sbt_error|escape:'htmlall':'UTF-8'}"
+     {if $sbt_error}data-sbt-error="{$sbt_error|escape:'htmlall':'UTF-8'}"{/if}
      style="display:none;"
      aria-hidden="true"></div>
 
