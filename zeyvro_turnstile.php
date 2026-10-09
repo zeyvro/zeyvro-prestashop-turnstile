@@ -61,7 +61,7 @@ class Zeyvro_Turnstile extends Module
         $this->version = '1.2.0';
         $this->author = 'Zeyvro';
         $this->need_instance = 0;
-        $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => '9.1.3'];
+        $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => '9.2.0'];
         $this->bootstrap = true;
 
         parent::__construct();
