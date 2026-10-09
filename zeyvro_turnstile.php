@@ -75,11 +75,13 @@ class Zeyvro_Turnstile extends Module
         // §7.1 — Auto-upgrade al subir ZIP por BO
         if (defined('_PS_ADMIN_DIR_') && !defined('ZEYVROTURNSTILE_UPGRADING')) {
             $this->runAutoUpgrade();
-            // v1.2.0 — los hooks nuevos (ZV_HOOKS) se registran aquí, ya con la clase nueva cargada, y no en
-            // upgrade-1.2.0.php: en PS 9 registerHook() mira el método en la clase vieja y la actualización falla.
-            if ($this->id) {
-                $this->turnstileEnsureHooks();
-            }
+        }
+        // v1.2.0 — los hooks nuevos (ZV_HOOKS) se registran aquí, ya con la clase nueva cargada, y no en
+        // upgrade-1.2.0.php: en PS 9 registerHook() mira el método en la clase vieja y la actualización falla.
+        // En BO y en front: una tienda actualizada queda protegida en la primera petición que cargue la clase nueva,
+        // aunque nadie abra el BO. Con la firma ya guardada cuesta un Configuration::get (en memoria).
+        if ($this->id && !defined('ZEYVROTURNSTILE_UPGRADING')) {
+            $this->turnstileEnsureHooks();
         }
     }
 
@@ -256,6 +258,7 @@ class Zeyvro_Turnstile extends Module
             return '';
         }
         $mode = Configuration::get('ZEYVRO_TURNSTILE_MODE') ?: 'managed';
+        $failed = implode(',', array_diff(array_keys(self::$sbtFailed), ['prestablog']));
 
         $this->context->smarty->assign([
             'sbt_site_key' => $siteKey,
@@ -264,8 +267,9 @@ class Zeyvro_Turnstile extends Module
             'sbt_page' => (string) $phpSelf,
             'sbt_auth_url' => $this->context->link->getPageLink('authentication', true),
             // prestablog no: su mensaje va en el bloque de notificaciones de la página (controller->errors)
-            'sbt_failed' => implode(',', array_diff(array_keys(self::$sbtFailed), ['prestablog'])),
-            'sbt_error' => $this->l('Security verification failed. Please try again.'),
+            'sbt_failed' => $failed,
+            // Solo con algún formulario rechazado en esta petición: sin fallo, el HTML queda como en la 1.1.10
+            'sbt_error' => $failed !== '' ? $this->l('Security verification failed. Please try again.') : '',
         ]);
 
         return $this->display(__FILE__, 'views/templates/front/turnstile_widget.tpl');
