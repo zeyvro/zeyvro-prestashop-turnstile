@@ -173,6 +173,11 @@
                 addWidget(form, submitButton(form) || form.querySelector('[name="submitCreate"]'), 'register', false);
                 return;
             }
+            if (on('login') && form.querySelector('[name="submitLogin"]')
+                && form.querySelector('input[name="password"]') && postsTo(form, authUrl)) {
+                addWidget(form, submitButton(form), 'login', page !== 'authentication');
+                return;
+            }
             // (formularios v1.2.0)
         });
         // (fuera de un <form>, v1.2.0)

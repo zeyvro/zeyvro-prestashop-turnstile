@@ -201,6 +201,8 @@ class Zeyvro_Turnstile extends Module
         $forms = [
             'contact' => $phpSelf === 'contact',
             'register' => $phpSelf === 'registration' && $this->isFormOn('register'),
+            // En todas las páginas: la ventana de login de los temas envía a la página de login nativa
+            'login' => !$this->context->customer->isLogged() && $this->isFormOn('login'),
         ];
         if (!in_array(true, $forms, true)) {
             return '';
@@ -341,6 +343,38 @@ class Zeyvro_Turnstile extends Module
         }
 
         return $this->verifyFormToken('register');
+    }
+
+    /**
+     * v1.2.0 — Verificación en el servidor del login, recuperar contraseña, comentarios de prestablog y avisos
+     * de ps_emailalerts. Va en actionDispatcher (justo antes de Controller::run()) y no en
+     * actionFrontControllerSetMedia: con ajax=1 o Accept: application/json, FrontController::init() pone
+     * display_header=false, el núcleo no llama a setMedia() y el envío pasaría sin verificar.
+     * Si falla, se quita del envío la clave que mira el controlador; el mensaje se pinta después, con el idioma
+     * ya resuelto (plantilla del widget, o actionFrontControllerSetMedia para prestablog y ps_emailalerts).
+     */
+    public function hookActionDispatcher($params): void
+    {
+        if (!(int) Configuration::get('ZEYVRO_TURNSTILE_ENABLED')) {
+            return;
+        }
+        $type = isset($params['controller_type']) ? (int) $params['controller_type'] : 0;
+        if ($type !== Dispatcher::FC_FRONT && $type !== Dispatcher::FC_MODULE) {
+            return;
+        }
+        $phpSelf = isset($this->context->controller->php_self) ? (string) $this->context->controller->php_self : '';
+        $form = null;
+        $keys = [];
+        if ($phpSelf === 'authentication' && Tools::isSubmit('submitLogin')) {
+            $form = 'login';
+            $keys = ['submitLogin', 'submitLogin_x', 'submitLogin_y'];
+        }
+        if ($form === null || !$this->isFormOn($form) || $this->verifyFormToken($form)) {
+            return;
+        }
+        foreach ($keys as $key) {
+            unset($_POST[$key], $_GET[$key]);
+        }
     }
 
     /* =====================================================================
