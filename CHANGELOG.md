@@ -15,7 +15,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ### Seguridad (ES)
 - **Contacto:** el mensaje enviado por GET (no solo por POST) también pasa por Turnstile. Sin token válido no se guarda y queda en el registro.
-- **Proceso de compra:** el inicio de sesión, la creación de cuenta y el pedido como invitado del paso «Datos personales» se verifican igual que en sus páginas: sin token válido no se inicia sesión ni se crea el cliente, queda en el registro y el aviso sale arriba de la página. El widget aparece en esos formularios con los interruptores de login y de registro.
+- **Proceso de compra:** el inicio de sesión, la creación de cuenta y el pedido como invitado del paso «Datos personales» se verifican igual que en sus páginas: sin token válido no se inicia sesión ni se crea el cliente, queda en el registro y el aviso sale arriba de la página. Una petición que lleva a la vez el envío del login y el del alta se verifica como alta (el núcleo crea la cuenta) y, si falla, no hace ninguna de las dos. El widget aparece en esos formularios con los interruptores de login y de registro.
 - **Panel:** guardar la configuración exige permiso de editar y vaciar el registro antiguo, permiso de borrar. Un perfil de solo ver ve el panel pero no cambia nada y recibe un error.
 
 ### Changed (EN)
@@ -26,7 +26,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ### Security (EN)
 - **Contact:** a message sent by GET (not only by POST) also goes through Turnstile. Without a valid token it is not saved and it is logged.
-- **Checkout:** login, account creation and guest checkout in the "Personal information" step are verified as on their own pages: without a valid token the customer is not logged in or created, the attempt is logged and the notice shows at the top of the page. The widget shows on those forms with the login and registration switches.
+- **Checkout:** login, account creation and guest checkout in the "Personal information" step are verified as on their own pages: without a valid token the customer is not logged in or created, the attempt is logged and the notice shows at the top of the page. A request that carries both the login and the account-creation submit is verified as account creation (the core creates the account) and, if it fails, does neither. The widget shows on those forms with the login and registration switches.
 - **Panel:** saving the settings requires the edit permission and clearing the old log requires the delete permission. A view-only profile sees the panel but changes nothing and gets an error.
 
 ---
