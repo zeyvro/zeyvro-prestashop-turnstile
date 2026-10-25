@@ -8,7 +8,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 ## 1.2.1 — 2026-10-25
 
 ### Cambiado (ES)
-- **Aviso rojo en el panel** (**PERSONALIZAR → Zeyvro → Anti SPAM**) mientras falte la clave del sitio o la clave secreta: «Turnstile no protege ningún formulario: falta la clave del sitio o la clave secreta.» Si el módulo está activado sin las claves, el aviso lo dice también.
+- **Aviso amarillo en el panel** (**PERSONALIZAR → Zeyvro → Anti SPAM**) mientras falte la clave del sitio o la clave secreta: «Turnstile no protege ningún formulario: falta la clave del sitio o la clave secreta.» Si el módulo está activado sin las claves, el aviso lo dice también.
 - **«Activar Turnstile» no se guarda sin las 2 claves.** El resto del formulario sí se guarda y sale el mismo aviso como error. Una clave que se deja en blanco al guardar cuenta con el valor ya guardado.
 - Al actualizar no cambia nada más: una tienda ya activada sin clave secreta sigue como estaba y solo ve el aviso.
 - `upgrade/upgrade-1.2.1.php`: invalida en OPcache los `.php` del módulo y limpia su caché. No toca la configuración. Idempotente.
@@ -19,7 +19,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 - **Panel:** guardar la configuración exige permiso de editar y vaciar el registro antiguo, permiso de borrar. Un perfil de solo ver ve el panel pero no cambia nada y recibe un error.
 
 ### Changed (EN)
-- **Red notice in the panel** (**CUSTOMIZE → Zeyvro → Anti SPAM**) while the site key or the secret key is missing: "Turnstile does not protect any form: the site key or the secret key is missing." If the module is enabled without the keys, the notice says so too.
+- **Yellow notice in the panel** (**CUSTOMIZE → Zeyvro → Anti SPAM**) while the site key or the secret key is missing: "Turnstile does not protect any form: the site key or the secret key is missing." If the module is enabled without the keys, the notice says so too.
 - **"Enable Turnstile" is not saved without both keys.** The rest of the form is saved and the same notice shows as an error. A key left blank when saving counts with its stored value.
 - Nothing else changes on upgrade: a shop already enabled without a secret key stays as it was and only sees the notice.
 - `upgrade/upgrade-1.2.1.php`: invalidates the module's `.php` files in OPcache and clears its cache. It does not touch the configuration. Idempotent.
