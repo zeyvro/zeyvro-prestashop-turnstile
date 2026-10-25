@@ -55,11 +55,14 @@ class Zeyvro_Turnstile extends Module
     /** @var array<string, bool> formularios cuya verificación ha fallado en esta petición */
     private static $sbtFailed = [];
 
+    /** v1.2.1 — formularios ya verificados en actionDispatcher en esta petición (un token vale una vez). */
+    private static $dispatcherChecked = [];
+
     public function __construct()
     {
         $this->name = 'zeyvro_turnstile';
         $this->tab = 'front_office_features';
-        $this->version = '1.2.0';
+        $this->version = '1.2.1';
         $this->author = 'Zeyvro';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => '9.2.0'];
@@ -243,7 +246,8 @@ class Zeyvro_Turnstile extends Module
             : null;
         $forms = [
             'contact' => $phpSelf === 'contact',
-            'register' => $phpSelf === 'registration' && $this->isFormOn('register'),
+            // v1.2.1 — también el checkout: alta con contraseña y pedido como invitado (los dos envían submitCreate)
+            'register' => in_array($phpSelf, ['registration', 'order'], true) && $this->isFormOn('register'),
             // En todas las páginas: la ventana de login de los temas envía a la página de login nativa
             'login' => !$this->context->customer->isLogged() && $this->isFormOn('login'),
             'password' => $phpSelf === 'password' && $this->isFormOn('password'),
@@ -298,7 +302,8 @@ class Zeyvro_Turnstile extends Module
             || $this->context->controller->php_self !== 'contact') {
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Tools::isSubmit('submitMessage')) {
+        // v1.2.1 — POST o GET: contactform procesa submitMessage venga por donde venga
+        if (!Tools::isSubmit('submitMessage')) {
             return;
         }
 
@@ -389,11 +394,14 @@ class Zeyvro_Turnstile extends Module
     /**
      * v1.2.0 — Registro. El núcleo ejecuta este hook en RegistrationController::initContent() justo antes de
      * $register_form->submit() y devolver false impide crear la cuenta (corre también con ajax=1).
-     * Desde 8.2 el checkout también lo ejecuta (CheckoutPersonalInformationStep): ahí no se toca, el checkout
-     * de invitado queda fuera de esta versión.
+     * Desde 8.2 el checkout también lo ejecuta (CheckoutPersonalInformationStep): ahí no se verifica otra vez,
+     * el registro y el pedido como invitado del checkout se verifican en actionDispatcher (v1.2.1).
      */
     public function hookActionSubmitAccountBefore($params): bool
     {
+        if (isset(self::$dispatcherChecked['register'])) {
+            return true;
+        }
         if (!isset($this->context->controller->php_self)
             || $this->context->controller->php_self !== 'registration'
             || !$this->isFormOn('register')) {
@@ -426,6 +434,14 @@ class Zeyvro_Turnstile extends Module
         if ($phpSelf === 'authentication' && Tools::isSubmit('submitLogin')) {
             $form = 'login';
             $keys = ['submitLogin', 'submitLogin_x', 'submitLogin_y'];
+        } elseif ($phpSelf === 'order' && Tools::isSubmit('submitLogin')) {
+            // v1.2.1 — login dentro del checkout (CheckoutPersonalInformationStep)
+            $form = 'login';
+            $keys = ['submitLogin', 'submitLogin_x', 'submitLogin_y'];
+        } elseif ($phpSelf === 'order' && Tools::isSubmit('submitCreate')) {
+            // v1.2.1 — alta y pedido como invitado del checkout (sin contraseña también envía submitCreate)
+            $form = 'register';
+            $keys = ['submitCreate'];
         } elseif ($phpSelf === 'password' && Tools::isSubmit('email')) {
             // Solo la petición del enlace; el formulario de la nueva contraseña (token + passwd) no se toca
             $form = 'password';
@@ -437,11 +453,19 @@ class Zeyvro_Turnstile extends Module
             $form = 'emailalerts';
             $keys = ['process'];
         }
-        if ($form === null || !$this->isFormOn($form) || $this->verifyFormToken($form)) {
+        if ($form === null || !$this->isFormOn($form)) {
+            return;
+        }
+        self::$dispatcherChecked[$form] = true;
+        if ($this->verifyFormToken($form)) {
             return;
         }
         foreach ($keys as $key) {
             unset($_POST[$key], $_GET[$key]);
+        }
+        if ($phpSelf === 'order') {
+            // El checkout redirige tras el POST (redirectWithNotifications): el aviso viaja en las notificaciones
+            $this->context->controller->errors[] = $this->l('Security verification failed. Please try again.');
         }
     }
 

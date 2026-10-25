@@ -1,6 +1,6 @@
 # zeyvro_turnstile — Cloudflare Turnstile Anti-Spam
 
-![Version](https://img.shields.io/badge/version-1.2.0-6C63FF)
+![Version](https://img.shields.io/badge/version-1.2.1-6C63FF)
 ![PrestaShop](https://img.shields.io/badge/PrestaShop-8.0%2B-00D9A3)
 ![PHP](https://img.shields.io/badge/PHP-8.0--8.3-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -10,7 +10,7 @@
 ## EN — What it does
 
 Protects the native PrestaShop contact form (`/contact-us`) against spam using [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/).
-Since 1.2.0 it also protects, each with its own switch: customer registration, login (including the login window of themes that post to the native login page), password recovery, prestablog blog comments and ps_emailalerts back-in-stock alerts (the last two only if those modules are installed and enabled). Account creation inside the checkout is not covered.
+Since 1.2.0 it also protects, each with its own switch: customer registration, login (including the login window of themes that post to the native login page), password recovery, prestablog blog comments and ps_emailalerts back-in-stock alerts (the last two only if those modules are installed and enabled). Since 1.2.1 the login, account creation and guest checkout inside the checkout are covered too.
 
 - Injects the Turnstile widget before the "Send" button.
 - Validates the token server-side via the Cloudflare API before processing.
@@ -50,7 +50,7 @@ To delete all data permanently, run `sql/uninstall.sql` manually in your DB clie
 ## ES — Qué hace
 
 Protege el formulario de contacto nativo de PrestaShop (`/contact-us`) contra spam con [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/).
-Desde la 1.2.0 protege también, cada uno con su interruptor: el registro de cliente, el inicio de sesión (incluida la ventana de inicio de sesión de los temas que envían a la página de login nativa), recuperar contraseña, los comentarios del blog de prestablog y los avisos de reposición de ps_emailalerts (estos dos, solo si esos módulos están instalados y activos). La creación de cuenta dentro del proceso de compra no está cubierta.
+Desde la 1.2.0 protege también, cada uno con su interruptor: el registro de cliente, el inicio de sesión (incluida la ventana de inicio de sesión de los temas que envían a la página de login nativa), recuperar contraseña, los comentarios del blog de prestablog y los avisos de reposición de ps_emailalerts (estos dos, solo si esos módulos están instalados y activos). Desde la 1.2.1 también el inicio de sesión, la creación de cuenta y el pedido como invitado dentro del proceso de compra.
 
 - Inyecta el widget Turnstile antes del botón "Enviar".
 - Valida el token en el servidor vía la API de Cloudflare antes de procesar el mensaje.
