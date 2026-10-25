@@ -14,7 +14,7 @@
  *}
 
 {if $missing_keys}
-  <div class="alert alert-danger zeyvro-turnstile-missing-keys">
+  <div class="alert alert-warning zeyvro-turnstile-missing-keys">
     {foreach $missing_keys as $line}
       <p><strong>{$line|escape:'htmlall':'UTF-8'}</strong></p>
     {/foreach}

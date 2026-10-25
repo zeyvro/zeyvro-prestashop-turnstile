@@ -174,7 +174,7 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
         $tplDir = _PS_MODULE_DIR_ . 'zeyvro_turnstile/views/templates/admin/';
         $this->context->smarty->addTemplateDir($tplDir);
 
-        // v1.2.1 — aviso rojo arriba mientras falte alguna clave; además dice si el módulo está activado.
+        // v1.2.1 — aviso amarillo arriba mientras falte alguna clave (un aviso, no un error: así sale tras instalar); además dice si el módulo está activado.
         $missingKeys = [];
         if (!$this->keysPresent()) {
             $missingKeys[] = $this->missingKeysMessage();
