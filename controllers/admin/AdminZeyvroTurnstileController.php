@@ -44,12 +44,21 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
 
     public function postProcess(): void
     {
+        // v1.2.1 — guardar exige permiso de editar y vaciar el registro, de borrar (un perfil de solo ver no cambia nada)
         if (Tools::isSubmit('submitZeyvroTurnstile')) {
-            $this->saveSettings();
+            if ($this->access('edit')) {
+                $this->saveSettings();
+            } else {
+                $this->errors[] = $this->trans('You do not have permission to edit this.', [], 'Admin.Notifications.Error');
+            }
         }
 
         if (Tools::getValue('clearOldLogs')) {
-            $this->clearOldLogs();
+            if ($this->access('delete')) {
+                $this->clearOldLogs();
+            } else {
+                $this->errors[] = $this->trans('You do not have permission to delete this.', [], 'Admin.Notifications.Error');
+            }
         }
 
         parent::postProcess();
@@ -87,7 +96,18 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
 
         $secretFields = ['ZEYVRO_TURNSTILE_SECRET_KEY', 'ZEYVRO_TURNSTILE_SITE_KEY'];
 
+        // v1.2.1 — sin las 2 claves el módulo deja pasar los envíos: «Activado» no se guarda (el resto sí).
+        // Cuenta la clave enviada si viene rellena y, si no, la guardada (las vacías no se sobrescriben, abajo).
+        $blockEnable = (int) Tools::getValue('ZEYVRO_TURNSTILE_ENABLED') === 1
+            && !$this->keysPresent(
+                trim((string) Tools::getValue('ZEYVRO_TURNSTILE_SITE_KEY')),
+                trim((string) Tools::getValue('ZEYVRO_TURNSTILE_SECRET_KEY'))
+            );
+
         foreach ($map as $key => $type) {
+            if ($blockEnable && $key === 'ZEYVRO_TURNSTILE_ENABLED') {
+                continue;
+            }
             $val = Tools::getValue($key);
             if ($key === 'ZEYVRO_TURNSTILE_MODE') {
                 $val = $mode;
@@ -105,7 +125,32 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
             Configuration::updateValue($key, $val);
         }
 
+        if ($blockEnable) {
+            $this->errors[] = $this->missingKeysMessage();
+
+            return;
+        }
         $this->confirmations[] = $this->l('Settings saved successfully.');
+    }
+
+    /**
+     * v1.2.1 — true si hay clave del sitio y clave secreta. Un valor vacío se toma de Configuration.
+     */
+    private function keysPresent(string $siteKey = '', string $secretKey = ''): bool
+    {
+        if ($siteKey === '') {
+            $siteKey = trim((string) Configuration::get('ZEYVRO_TURNSTILE_SITE_KEY'));
+        }
+        if ($secretKey === '') {
+            $secretKey = trim((string) Configuration::get('ZEYVRO_TURNSTILE_SECRET_KEY'));
+        }
+
+        return $siteKey !== '' && $secretKey !== '';
+    }
+
+    private function missingKeysMessage(): string
+    {
+        return $this->l('Turnstile does not protect any form: the site key or the secret key is missing.');
     }
 
     private function clearOldLogs(): void
@@ -129,8 +174,18 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
         $tplDir = _PS_MODULE_DIR_ . 'zeyvro_turnstile/views/templates/admin/';
         $this->context->smarty->addTemplateDir($tplDir);
 
+        // v1.2.1 — aviso rojo arriba mientras falte alguna clave; además dice si el módulo está activado.
+        $missingKeys = [];
+        if (!$this->keysPresent()) {
+            $missingKeys[] = $this->missingKeysMessage();
+            if ((int) Configuration::get('ZEYVRO_TURNSTILE_ENABLED') === 1) {
+                $missingKeys[] = $this->l('The module is enabled but is not protecting anything.');
+            }
+        }
+
         // Log panel — all variables escaped inside the template; no nofilter needed.
         $this->context->smarty->assign([
+            'missing_keys' => $missingKeys,
             'logs' => $this->getRecentLogs(50),
             'log_total' => $this->getLogCount(),
             'clear_url' => $this->context->link->getAdminLink('AdminZeyvroTurnstile') . '&clearOldLogs=1',
@@ -140,7 +195,8 @@ class AdminZeyvroTurnstileController extends ModuleAdminController
 
         // Set $this->content directly — avoids {var nofilter} in templates (Validator check 14).
         // renderSettingsForm() returns HelperForm HTML (safe, PS-generated).
-        $this->content = $this->renderSettingsForm()
+        $this->content = $this->context->smarty->fetch($tplDir . 'missing_keys.tpl')
+            . $this->renderSettingsForm()
             . $this->context->smarty->fetch($tplDir . 'settings.tpl');
 
         // parent::initContent() already assigned 'content' to Smarty with the empty string.

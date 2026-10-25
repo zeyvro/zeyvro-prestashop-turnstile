@@ -194,8 +194,9 @@
                 addWidget(form, submitButton(form) || form.querySelector('[name="submitCreate"]'), 'register', false);
                 return;
             }
+            // v1.2.1 — también el login del checkout, que envía a la página de pedido
             if (on('login') && form.querySelector('[name="submitLogin"]')
-                && form.querySelector('input[name="password"]') && postsTo(form, authUrl)) {
+                && form.querySelector('input[name="password"]') && (postsTo(form, authUrl) || page === 'order')) {
                 addWidget(form, submitButton(form), 'login', page !== 'authentication');
                 return;
             }

@@ -75,3 +75,5 @@ $_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_82e614267
 $_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_35c5dd69680a3f8a05b5d0e83a394a68'] = 'Proteger los comentarios del blog (prestablog)';
 $_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_531072ee100837c72c92a2a29e376693'] = 'Proteger los avisos de reposición (ps_emailalerts)';
 $_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_62fa42c57273d2aaab44a3924ffe7c2a'] = 'Solo actúa si el módulo está instalado y activo.';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_ba6acbe6c81d61c0f0a9b573ce7e4297'] = 'Turnstile no protege ningún formulario: falta la clave del sitio o la clave secreta.';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_fddddfb129bfce01c553ace5502bfb94'] = 'El módulo está activado pero no protege nada.';

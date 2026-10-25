@@ -60,3 +60,5 @@ $_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_82e614267
 $_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_35c5dd69680a3f8a05b5d0e83a394a68'] = 'Protect blog comments (prestablog)';
 $_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_531072ee100837c72c92a2a29e376693'] = 'Protect back-in-stock alerts (ps_emailalerts)';
 $_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_62fa42c57273d2aaab44a3924ffe7c2a'] = 'Only applies if the module is installed and enabled.';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_ba6acbe6c81d61c0f0a9b573ce7e4297'] = 'Turnstile does not protect any form: the site key or the secret key is missing.';
+$_MODULE['<{zeyvro_turnstile}prestashop>adminzeyvroturnstilecontroller_fddddfb129bfce01c553ace5502bfb94'] = 'The module is enabled but is not protecting anything.';

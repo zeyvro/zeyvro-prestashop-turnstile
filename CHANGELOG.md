@@ -5,6 +5,32 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · [Semantic Ve
 
 ---
 
+## 1.2.1 — 2026-10-25
+
+### Cambiado (ES)
+- **Aviso rojo en el panel** (**PERSONALIZAR → Zeyvro → Anti SPAM**) mientras falte la clave del sitio o la clave secreta: «Turnstile no protege ningún formulario: falta la clave del sitio o la clave secreta.» Si el módulo está activado sin las claves, el aviso lo dice también.
+- **«Activar Turnstile» no se guarda sin las 2 claves.** El resto del formulario sí se guarda y sale el mismo aviso como error. Una clave que se deja en blanco al guardar cuenta con el valor ya guardado.
+- Al actualizar no cambia nada más: una tienda ya activada sin clave secreta sigue como estaba y solo ve el aviso.
+- `upgrade/upgrade-1.2.1.php`: invalida en OPcache los `.php` del módulo y limpia su caché. No toca la configuración. Idempotente.
+
+### Seguridad (ES)
+- **Contacto:** el mensaje enviado por GET (no solo por POST) también pasa por Turnstile. Sin token válido no se guarda y queda en el registro.
+- **Proceso de compra:** el inicio de sesión, la creación de cuenta y el pedido como invitado del paso «Datos personales» se verifican igual que en sus páginas: sin token válido no se inicia sesión ni se crea el cliente, queda en el registro y el aviso sale arriba de la página. El widget aparece en esos formularios con los interruptores de login y de registro.
+- **Panel:** guardar la configuración exige permiso de editar y vaciar el registro antiguo, permiso de borrar. Un perfil de solo ver ve el panel pero no cambia nada y recibe un error.
+
+### Changed (EN)
+- **Red notice in the panel** (**CUSTOMIZE → Zeyvro → Anti SPAM**) while the site key or the secret key is missing: "Turnstile does not protect any form: the site key or the secret key is missing." If the module is enabled without the keys, the notice says so too.
+- **"Enable Turnstile" is not saved without both keys.** The rest of the form is saved and the same notice shows as an error. A key left blank when saving counts with its stored value.
+- Nothing else changes on upgrade: a shop already enabled without a secret key stays as it was and only sees the notice.
+- `upgrade/upgrade-1.2.1.php`: invalidates the module's `.php` files in OPcache and clears its cache. It does not touch the configuration. Idempotent.
+
+### Security (EN)
+- **Contact:** a message sent by GET (not only by POST) also goes through Turnstile. Without a valid token it is not saved and it is logged.
+- **Checkout:** login, account creation and guest checkout in the "Personal information" step are verified as on their own pages: without a valid token the customer is not logged in or created, the attempt is logged and the notice shows at the top of the page. The widget shows on those forms with the login and registration switches.
+- **Panel:** saving the settings requires the edit permission and clearing the old log requires the delete permission. A view-only profile sees the panel but changes nothing and gets an error.
+
+---
+
 ## 1.2.0 — 2026-10-09
 
 ### Añadido (ES)
