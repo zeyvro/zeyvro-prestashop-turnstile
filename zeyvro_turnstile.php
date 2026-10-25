@@ -434,14 +434,16 @@ class Zeyvro_Turnstile extends Module
         if ($phpSelf === 'authentication' && Tools::isSubmit('submitLogin')) {
             $form = 'login';
             $keys = ['submitLogin', 'submitLogin_x', 'submitLogin_y'];
+        } elseif ($phpSelf === 'order' && Tools::isSubmit('submitCreate')) {
+            // v1.2.1 — alta y pedido como invitado del checkout (sin contraseña también envía submitCreate).
+            // Antes que el login: CheckoutPersonalInformationStep::handleRequest() mira submitCreate primero,
+            // así que una petición con las dos claves crea la cuenta. Si falla, fuera las dos.
+            $form = 'register';
+            $keys = ['submitCreate', 'submitLogin', 'submitLogin_x', 'submitLogin_y'];
         } elseif ($phpSelf === 'order' && Tools::isSubmit('submitLogin')) {
             // v1.2.1 — login dentro del checkout (CheckoutPersonalInformationStep)
             $form = 'login';
             $keys = ['submitLogin', 'submitLogin_x', 'submitLogin_y'];
-        } elseif ($phpSelf === 'order' && Tools::isSubmit('submitCreate')) {
-            // v1.2.1 — alta y pedido como invitado del checkout (sin contraseña también envía submitCreate)
-            $form = 'register';
-            $keys = ['submitCreate'];
         } elseif ($phpSelf === 'password' && Tools::isSubmit('email')) {
             // Solo la petición del enlace; el formulario de la nueva contraseña (token + passwd) no se toca
             $form = 'password';
